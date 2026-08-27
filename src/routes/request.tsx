@@ -55,7 +55,7 @@ export const Route = createFileRoute("/request")({
       },
     ],
   }),
-  component: RequestWizard;
+  component: RequestWizard,
 });
 
 type VendorForm = {
