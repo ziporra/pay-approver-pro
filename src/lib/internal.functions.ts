@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import type { Database } from "@/integrations/supabase/types";
 
 /** Roles for the signed-in user, used to shape the internal UI. */
 export const getMyAccess = createServerFn({ method: "GET" })
@@ -89,7 +90,11 @@ const decisionSchema = z.object({
   reference: z.string().max(120).optional().nullable(),
 });
 
-const NEXT_STATUS: Record<string, string> = {
+type PaymentStatus =
+  Database["public"]["Tables"]["payment_requests"]["Row"]["status"];
+type RequestUpdate = Database["public"]["Tables"]["payment_requests"]["Update"];
+
+const NEXT_STATUS: Record<string, PaymentStatus> = {
   approve: "awaiting_payment",
   reject: "rejected",
   mark_paid: "paid",
@@ -118,21 +123,21 @@ export const decidePaymentRequest = createServerFn({ method: "POST" })
       nextStatus = "awaiting_invoice";
     }
 
-    const patch: Record<string, unknown> = { status: nextStatus };
+    const patch: RequestUpdate = { status: nextStatus };
     if (data.action === "approve") {
-      patch["approved_at"] = new Date().toISOString();
-      patch["approved_by"] = context.userId;
+      patch.approved_at = new Date().toISOString();
+      patch.approved_by = context.userId;
     }
     if (data.action === "reject") {
-      patch["rejected_at"] = new Date().toISOString();
-      patch["rejection_reason"] = data.note;
+      patch.rejected_at = new Date().toISOString();
+      patch.rejection_reason = data.note ?? null;
     }
     if (data.action === "mark_paid") {
-      patch["paid_at"] = new Date().toISOString();
-      patch["payment_reference"] = data.reference ?? null;
+      patch.paid_at = new Date().toISOString();
+      patch.payment_reference = data.reference ?? null;
     }
     if (data.action === "invoice_received") {
-      patch["invoice_status"] = "attached";
+      patch.invoice_status = "attached";
     }
 
     const { error: updateError } = await context.supabase
@@ -152,7 +157,7 @@ export const decidePaymentRequest = createServerFn({ method: "POST" })
     if (data.action === "approve" || data.action === "reject") {
       await context.supabase.from("payment_approvals").insert({
         payment_request_id: data.requestId,
-        approver_id: context.userId,
+        decided_by: context.userId,
         decision: data.action === "approve" ? "approved" : "rejected",
         reason: data.note ?? null,
       });
