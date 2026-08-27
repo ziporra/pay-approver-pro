@@ -10,12 +10,19 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as RequestRouteImport } from './routes/request'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedVendorsRouteImport } from './routes/_authenticated/vendors'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -28,33 +35,58 @@ const RequestRoute = RequestRouteImport.update({
   path: '/request',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedVendorsRoute = AuthenticatedVendorsRouteImport.update({
+  id: '/vendors',
+  path: '/vendors',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/request': typeof RequestRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/vendors': typeof AuthenticatedVendorsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/request': typeof RequestRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/vendors': typeof AuthenticatedVendorsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/request': typeof RequestRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/vendors': typeof AuthenticatedVendorsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/request'
+  fullPaths: '/' | '/auth' | '/request' | '/dashboard' | '/vendors'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/request'
-  id: '__root__' | '/' | '/auth' | '/request'
+  to: '/' | '/auth' | '/request' | '/dashboard' | '/vendors'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/request'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/vendors'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   RequestRoute: typeof RequestRoute
 }
@@ -66,6 +98,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -82,11 +121,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RequestRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/vendors': {
+      id: '/_authenticated/vendors'
+      path: '/vendors'
+      fullPath: '/vendors'
+      preLoaderRoute: typeof AuthenticatedVendorsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedVendorsRoute: typeof AuthenticatedVendorsRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedVendorsRoute: AuthenticatedVendorsRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   RequestRoute: RequestRoute,
 }
