@@ -109,7 +109,7 @@ export const decidePaymentRequest = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { data: current, error: readError } = await context.supabase
       .from("payment_requests")
-      .select("id, status, invoice_status, request_number")
+      .select("id, status, invoice_status, request_number, amount, currency")
       .eq("id", data.requestId)
       .maybeSingle();
     if (readError || !current) throw new Error("Payment request not found.");
@@ -134,7 +134,6 @@ export const decidePaymentRequest = createServerFn({ method: "POST" })
     }
     if (data.action === "mark_paid") {
       patch.paid_at = new Date().toISOString();
-      patch.payment_reference = data.reference ?? null;
     }
     if (data.action === "invoice_received") {
       patch.invoice_status = "attached";
@@ -145,6 +144,18 @@ export const decidePaymentRequest = createServerFn({ method: "POST" })
       .update(patch)
       .eq("id", data.requestId);
     if (updateError) throw new Error(updateError.message);
+
+    if (data.action === "mark_paid") {
+      await context.supabase.from("payment_transactions").insert({
+        payment_request_id: data.requestId,
+        amount_paid: current.amount,
+        currency_paid: current.currency,
+        paid_on: new Date().toISOString().slice(0, 10),
+        recorded_by: context.userId,
+        reference: data.reference?.trim() || current.request_number,
+        notes: data.note ?? null,
+      });
+    }
 
     await context.supabase.from("payment_status_history").insert({
       payment_request_id: data.requestId,
