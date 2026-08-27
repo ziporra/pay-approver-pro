@@ -222,17 +222,20 @@ function RequestWizard() {
           ...prev,
           vendor_name: res.vendor.vendorName,
           beneficiary_name: res.vendor.beneficiaryName,
-          contact_first_name: res.vendor.firstName ?? "",
-          contact_last_name: res.vendor.lastName ?? "",
+          contact_first_name: res.vendor.contactName.split(" ")[0] ?? "",
+          contact_last_name: res.vendor.contactName.split(" ").slice(1).join(" "),
           email: lookupEmail.trim(),
           city: res.vendor.city ?? "",
           country: res.vendor.country ?? "",
         }));
         if (res.vendor.preferredCurrency) setCurrency(res.vendor.preferredCurrency);
-        if (res.vendor.preferredMethod) {
-          setPaymentField("method", res.vendor.preferredMethod as PaymentForm["method"]);
-        }
-        setMaskedSummary(res.vendor.maskedLines);
+        if (res.vendor.method) setPaymentField("method", res.vendor.method);
+        setMaskedSummary([
+          `${res.vendor.vendorName}`,
+          `${res.vendor.maskedEmail}`,
+          `${res.vendor.maskedPhone}`,
+          `${res.vendor.maskedPaymentSummary}`,
+        ]);
         setLookupState("found");
       } else {
         setVendor((prev) => ({ ...prev, email: lookupEmail.trim() }));
