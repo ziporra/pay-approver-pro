@@ -15,7 +15,9 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as RequestRouteImport } from './routes/request'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedPaymentsRouteImport } from './routes/_authenticated/payments'
+import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedVendorsRouteImport } from './routes/_authenticated/vendors'
+import { Route as ApiPublicBootstrapStaffRouteImport } from './routes/api/public/bootstrap-staff'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -46,10 +48,20 @@ const AuthenticatedPaymentsRoute = AuthenticatedPaymentsRouteImport.update({
   path: '/payments',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedVendorsRoute = AuthenticatedVendorsRouteImport.update({
   id: '/vendors',
   path: '/vendors',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const ApiPublicBootstrapStaffRoute = ApiPublicBootstrapStaffRouteImport.update({
+  id: '/api/public/bootstrap-staff',
+  path: '/api/public/bootstrap-staff',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -58,7 +70,9 @@ export interface FileRoutesByFullPath {
   '/request': typeof RequestRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/payments': typeof AuthenticatedPaymentsRoute
+  '/profile': typeof AuthenticatedProfileRoute
   '/vendors': typeof AuthenticatedVendorsRoute
+  '/api/public/bootstrap-staff': typeof ApiPublicBootstrapStaffRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -66,7 +80,9 @@ export interface FileRoutesByTo {
   '/request': typeof RequestRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/payments': typeof AuthenticatedPaymentsRoute
+  '/profile': typeof AuthenticatedProfileRoute
   '/vendors': typeof AuthenticatedVendorsRoute
+  '/api/public/bootstrap-staff': typeof ApiPublicBootstrapStaffRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -76,14 +92,31 @@ export interface FileRoutesById {
   '/request': typeof RequestRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/payments': typeof AuthenticatedPaymentsRoute
+  '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/vendors': typeof AuthenticatedVendorsRoute
+  '/api/public/bootstrap-staff': typeof ApiPublicBootstrapStaffRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/auth' | '/request' | '/dashboard' | '/payments' | '/vendors'
+    | '/'
+    | '/auth'
+    | '/request'
+    | '/dashboard'
+    | '/payments'
+    | '/profile'
+    | '/vendors'
+    | '/api/public/bootstrap-staff'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/request' | '/dashboard' | '/payments' | '/vendors'
+  to:
+    | '/'
+    | '/auth'
+    | '/request'
+    | '/dashboard'
+    | '/payments'
+    | '/profile'
+    | '/vendors'
+    | '/api/public/bootstrap-staff'
   id:
     | '__root__'
     | '/'
@@ -92,7 +125,9 @@ export interface FileRouteTypes {
     | '/request'
     | '/_authenticated/dashboard'
     | '/_authenticated/payments'
+    | '/_authenticated/profile'
     | '/_authenticated/vendors'
+    | '/api/public/bootstrap-staff'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -100,6 +135,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   RequestRoute: typeof RequestRoute
+  ApiPublicBootstrapStaffRoute: typeof ApiPublicBootstrapStaffRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -146,6 +182,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPaymentsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/vendors': {
       id: '/_authenticated/vendors'
       path: '/vendors'
@@ -153,18 +196,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedVendorsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/bootstrap-staff': {
+      id: '/api/public/bootstrap-staff'
+      path: '/api/public/bootstrap-staff'
+      fullPath: '/api/public/bootstrap-staff'
+      preLoaderRoute: typeof ApiPublicBootstrapStaffRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedPaymentsRoute: typeof AuthenticatedPaymentsRoute
+  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedVendorsRoute: typeof AuthenticatedVendorsRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedPaymentsRoute: AuthenticatedPaymentsRoute,
+  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedVendorsRoute: AuthenticatedVendorsRoute,
 }
 
@@ -176,6 +228,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   RequestRoute: RequestRoute,
+  ApiPublicBootstrapStaffRoute: ApiPublicBootstrapStaffRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
