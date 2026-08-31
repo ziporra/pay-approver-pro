@@ -82,8 +82,11 @@ function PaymentDetailPage() {
                 <Row label={t("request.po")} value={r.po_reference ?? "—"} />
                 <Row label={t("table.requestDate")} value={formatDate(r.created_at, locale)} />
                 <Row label={t("table.dueDate")} value={formatDate(r.due_date, locale)} />
-                <Row label={t("table.invoice")} value={t(`invoice.${r.invoice_status}` as never)} />
-                <Row label={t("method.title")} value={t(`method.${r.payment_method === "paypal" ? "paypal" : "bank"}` as never)} />
+                <Row label={t("table.invoice")} value={r.invoice_status} />
+                <Row
+                  label={t("method.title")}
+                  value={r.payment_method === "paypal" ? t("method.paypal") : t("method.bank")}
+                />
               </dl>
               {r.notes ? (
                 <p className="mt-4 rounded-md bg-muted/60 p-3 text-sm">{r.notes}</p>
