@@ -38,42 +38,90 @@ export type Database = {
       audit_logs: {
         Row: {
           action: string
+          actor_email: string | null
           actor_id: string | null
           actor_label: string | null
           actor_role: string | null
+          field: string | null
           id: string
           metadata: Json
           new_status: string | null
+          new_value_masked: string | null
           occurred_at: string
+          old_value_masked: string | null
           payment_request_id: string | null
           previous_status: string | null
           vendor_id: string | null
         }
         Insert: {
           action: string
+          actor_email?: string | null
           actor_id?: string | null
           actor_label?: string | null
           actor_role?: string | null
+          field?: string | null
           id?: string
           metadata?: Json
           new_status?: string | null
+          new_value_masked?: string | null
           occurred_at?: string
+          old_value_masked?: string | null
           payment_request_id?: string | null
           previous_status?: string | null
           vendor_id?: string | null
         }
         Update: {
           action?: string
+          actor_email?: string | null
           actor_id?: string | null
           actor_label?: string | null
           actor_role?: string | null
+          field?: string | null
           id?: string
           metadata?: Json
           new_status?: string | null
+          new_value_masked?: string | null
           occurred_at?: string
+          old_value_masked?: string | null
           payment_request_id?: string | null
           previous_status?: string | null
           vendor_id?: string | null
+        }
+        Relationships: []
+      }
+      bank_directory: {
+        Row: {
+          bank_address: string | null
+          bank_name: string
+          country: string
+          created_at: string
+          id: string
+          source: string
+          swift_bic: string | null
+          updated_at: string
+          verified: boolean
+        }
+        Insert: {
+          bank_address?: string | null
+          bank_name: string
+          country: string
+          created_at?: string
+          id?: string
+          source?: string
+          swift_bic?: string | null
+          updated_at?: string
+          verified?: boolean
+        }
+        Update: {
+          bank_address?: string | null
+          bank_name?: string
+          country?: string
+          created_at?: string
+          id?: string
+          source?: string
+          swift_bic?: string | null
+          updated_at?: string
+          verified?: boolean
         }
         Relationships: []
       }
@@ -585,24 +633,45 @@ export type Database = {
       }
       profiles: {
         Row: {
+          avatar_color: string | null
+          avatar_url: string | null
           created_at: string
+          display_name: string | null
           email: string
           full_name: string | null
           id: string
+          locale: string
+          must_change_password: boolean
+          notification_prefs: Json
+          password_changed_at: string | null
           updated_at: string
         }
         Insert: {
+          avatar_color?: string | null
+          avatar_url?: string | null
           created_at?: string
+          display_name?: string | null
           email: string
           full_name?: string | null
           id: string
+          locale?: string
+          must_change_password?: boolean
+          notification_prefs?: Json
+          password_changed_at?: string | null
           updated_at?: string
         }
         Update: {
+          avatar_color?: string | null
+          avatar_url?: string | null
           created_at?: string
+          display_name?: string | null
           email?: string
           full_name?: string | null
           id?: string
+          locale?: string
+          must_change_password?: boolean
+          notification_prefs?: Json
+          password_changed_at?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -662,6 +731,8 @@ export type Database = {
           bsb: string | null
           clabe: string | null
           created_at: string
+          directory_bank_id: string | null
+          entry_source: string
           iban: string | null
           id: string
           instructions: string | null
@@ -692,6 +763,8 @@ export type Database = {
           bsb?: string | null
           clabe?: string | null
           created_at?: string
+          directory_bank_id?: string | null
+          entry_source?: string
           iban?: string | null
           id?: string
           instructions?: string | null
@@ -722,6 +795,8 @@ export type Database = {
           bsb?: string | null
           clabe?: string | null
           created_at?: string
+          directory_bank_id?: string | null
+          entry_source?: string
           iban?: string | null
           id?: string
           instructions?: string | null
@@ -741,6 +816,13 @@ export type Database = {
           vendor_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "vendor_bank_accounts_directory_bank_id_fkey"
+            columns: ["directory_bank_id"]
+            isOneToOne: false
+            referencedRelation: "bank_directory"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "vendor_bank_accounts_vendor_id_fkey"
             columns: ["vendor_id"]
@@ -940,6 +1022,20 @@ export type Database = {
       }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
       next_payment_request_number: { Args: never; Returns: string }
+      write_audit: {
+        Args: {
+          _action: string
+          _field?: string
+          _metadata?: Json
+          _new_masked?: string
+          _new_status?: string
+          _old_masked?: string
+          _payment_request_id?: string
+          _previous_status?: string
+          _vendor_id?: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       app_role:
