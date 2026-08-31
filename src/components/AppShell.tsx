@@ -48,7 +48,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               ))}
           </nav>
           <div className="ms-auto flex items-center gap-2">
-            <LanguageSelector />
+            <LanguageSelector persist />
             <ProfileMenu />
           </div>
         </div>

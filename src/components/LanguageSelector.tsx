@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { LOCALES, useI18n } from "@/lib/i18n";
+import { updateMyProfile } from "@/lib/staff.functions";
 
 export function LanguageSelector({
   variant = "ghost",
@@ -36,7 +37,7 @@ export function LanguageSelector({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-44">
         {LOCALES.map((l) => (
-          <DropdownMenuItem key={l.code} onSelect={() => setLocale(l.code)} className="gap-2">
+          <DropdownMenuItem key={l.code} onSelect={() => choose(l.code)} className="gap-2">
             <span aria-hidden>{l.flag}</span>
             <span className="flex-1">{l.label}</span>
             {l.code === locale ? <Check className="size-4 text-accent" /> : null}
