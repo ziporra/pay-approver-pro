@@ -165,6 +165,15 @@ export const decidePaymentRequest = createServerFn({ method: "POST" })
       note: data.note ?? null,
     });
 
+    // Identity-linked, append-only audit entry for the activity timeline.
+    await context.supabase.rpc("write_audit", {
+      _action: data.action,
+      _payment_request_id: data.requestId,
+      _previous_status: current.status,
+      _new_status: nextStatus,
+      _metadata: { note: data.note ?? null, reference: data.reference ?? null },
+    });
+
     if (data.action === "approve" || data.action === "reject") {
       await context.supabase.from("payment_approvals").insert({
         payment_request_id: data.requestId,
