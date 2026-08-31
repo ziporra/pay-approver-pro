@@ -18,6 +18,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedPaymentsRouteImport } from './routes/_authenticated/payments'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedVendorsRouteImport } from './routes/_authenticated/vendors'
+import { Route as AuthenticatedPaymentsIdRouteImport } from './routes/_authenticated/payments.$id'
 import { Route as ApiPublicBootstrapStaffRouteImport } from './routes/api/public/bootstrap-staff'
 
 const IndexRoute = IndexRouteImport.update({
@@ -64,6 +65,11 @@ const AuthenticatedVendorsRoute = AuthenticatedVendorsRouteImport.update({
   path: '/vendors',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPaymentsIdRoute = AuthenticatedPaymentsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AuthenticatedPaymentsRoute,
+} as any)
 const ApiPublicBootstrapStaffRoute = ApiPublicBootstrapStaffRouteImport.update({
   id: '/api/public/bootstrap-staff',
   path: '/api/public/bootstrap-staff',
@@ -76,9 +82,10 @@ export interface FileRoutesByFullPath {
   '/request': typeof RequestRoute
   '/audit': typeof AuthenticatedAuditRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/payments': typeof AuthenticatedPaymentsRoute
+  '/payments': typeof AuthenticatedPaymentsRouteWithChildren
   '/profile': typeof AuthenticatedProfileRoute
   '/vendors': typeof AuthenticatedVendorsRoute
+  '/payments/$id': typeof AuthenticatedPaymentsIdRoute
   '/api/public/bootstrap-staff': typeof ApiPublicBootstrapStaffRoute
 }
 export interface FileRoutesByTo {
@@ -87,9 +94,10 @@ export interface FileRoutesByTo {
   '/request': typeof RequestRoute
   '/audit': typeof AuthenticatedAuditRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/payments': typeof AuthenticatedPaymentsRoute
+  '/payments': typeof AuthenticatedPaymentsRouteWithChildren
   '/profile': typeof AuthenticatedProfileRoute
   '/vendors': typeof AuthenticatedVendorsRoute
+  '/payments/$id': typeof AuthenticatedPaymentsIdRoute
   '/api/public/bootstrap-staff': typeof ApiPublicBootstrapStaffRoute
 }
 export interface FileRoutesById {
@@ -100,9 +108,10 @@ export interface FileRoutesById {
   '/request': typeof RequestRoute
   '/_authenticated/audit': typeof AuthenticatedAuditRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
-  '/_authenticated/payments': typeof AuthenticatedPaymentsRoute
+  '/_authenticated/payments': typeof AuthenticatedPaymentsRouteWithChildren
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/vendors': typeof AuthenticatedVendorsRoute
+  '/_authenticated/payments/$id': typeof AuthenticatedPaymentsIdRoute
   '/api/public/bootstrap-staff': typeof ApiPublicBootstrapStaffRoute
 }
 export interface FileRouteTypes {
@@ -116,6 +125,7 @@ export interface FileRouteTypes {
     | '/payments'
     | '/profile'
     | '/vendors'
+    | '/payments/$id'
     | '/api/public/bootstrap-staff'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -127,6 +137,7 @@ export interface FileRouteTypes {
     | '/payments'
     | '/profile'
     | '/vendors'
+    | '/payments/$id'
     | '/api/public/bootstrap-staff'
   id:
     | '__root__'
@@ -139,6 +150,7 @@ export interface FileRouteTypes {
     | '/_authenticated/payments'
     | '/_authenticated/profile'
     | '/_authenticated/vendors'
+    | '/_authenticated/payments/$id'
     | '/api/public/bootstrap-staff'
   fileRoutesById: FileRoutesById
 }
@@ -215,6 +227,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedVendorsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/payments/$id': {
+      id: '/_authenticated/payments/$id'
+      path: '/$id'
+      fullPath: '/payments/$id'
+      preLoaderRoute: typeof AuthenticatedPaymentsIdRouteImport
+      parentRoute: typeof AuthenticatedPaymentsRoute
+    }
     '/api/public/bootstrap-staff': {
       id: '/api/public/bootstrap-staff'
       path: '/api/public/bootstrap-staff'
@@ -225,10 +244,23 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedPaymentsRouteChildren {
+  AuthenticatedPaymentsIdRoute: typeof AuthenticatedPaymentsIdRoute
+}
+
+const AuthenticatedPaymentsRouteChildren: AuthenticatedPaymentsRouteChildren = {
+  AuthenticatedPaymentsIdRoute: AuthenticatedPaymentsIdRoute,
+}
+
+const AuthenticatedPaymentsRouteWithChildren =
+  AuthenticatedPaymentsRoute._addFileChildren(
+    AuthenticatedPaymentsRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAuditRoute: typeof AuthenticatedAuditRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
-  AuthenticatedPaymentsRoute: typeof AuthenticatedPaymentsRoute
+  AuthenticatedPaymentsRoute: typeof AuthenticatedPaymentsRouteWithChildren
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedVendorsRoute: typeof AuthenticatedVendorsRoute
 }
@@ -236,7 +268,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAuditRoute: AuthenticatedAuditRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
-  AuthenticatedPaymentsRoute: AuthenticatedPaymentsRoute,
+  AuthenticatedPaymentsRoute: AuthenticatedPaymentsRouteWithChildren,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedVendorsRoute: AuthenticatedVendorsRoute,
 }
