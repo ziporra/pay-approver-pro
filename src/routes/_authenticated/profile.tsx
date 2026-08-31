@@ -48,10 +48,9 @@ export const Route = createFileRoute("/_authenticated/profile")({
 });
 
 const NOTIFICATION_KEYS = [
-  { key: "new_request", label: "notify.newRequest" },
-  { key: "approval_needed", label: "notify.approvalNeeded" },
-  { key: "payment_due", label: "notify.paymentDue" },
-  { key: "invoice_missing", label: "notify.invoiceMissing" },
+  { key: "approval", label: "notify.approval" },
+  { key: "payment", label: "notify.payment" },
+  { key: "invoice", label: "notify.invoice" },
 ] as const;
 
 function ProfilePage() {
