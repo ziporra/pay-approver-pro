@@ -1,4 +1,4 @@
-import { ChangePasswordForm } from "@/routes/_authenticated/profile";
+import { ChangePasswordForm } from "@/components/ChangePasswordForm";
 import {
   Dialog,
   DialogContent,
