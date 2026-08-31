@@ -17,7 +17,7 @@ import { formatDate } from "@/lib/format";
 import { useI18n } from "@/lib/i18n";
 import { LOCALES, type Locale } from "@/lib/i18n/dictionaries";
 import { useStaffProfile } from "@/lib/staff-profile";
-import { markPasswordChanged, updateMyProfile } from "@/lib/staff.functions";
+import { updateMyProfile } from "@/lib/staff.functions";
 import { cn } from "@/lib/utils";
 
 type ProfilePatch = {
