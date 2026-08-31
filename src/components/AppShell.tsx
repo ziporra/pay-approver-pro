@@ -1,33 +1,25 @@
-import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { useQueryClient } from "@tanstack/react-query";
-import { LayoutDashboard, LogOut, Receipt, Users } from "lucide-react";
+import { Link, useRouterState } from "@tanstack/react-router";
+import { LayoutDashboard, Receipt, ScrollText, Users } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { Brand } from "@/components/Brand";
 import { LanguageSelector } from "@/components/LanguageSelector";
-import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
+import { ProfileMenu } from "@/components/ProfileMenu";
 import { useI18n } from "@/lib/i18n";
+import { useStaffProfile } from "@/lib/staff-profile";
 import { cn } from "@/lib/utils";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { t } = useI18n();
-  const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { isAdmin } = useStaffProfile();
 
   const nav = [
-    { to: "/dashboard", label: t("nav.dashboard"), icon: LayoutDashboard },
-    { to: "/payments", label: t("nav.payments"), icon: Receipt },
-    { to: "/vendors", label: t("nav.vendors"), icon: Users },
+    { to: "/dashboard", label: t("nav.dashboard"), icon: LayoutDashboard, admin: false },
+    { to: "/payments", label: t("nav.payments"), icon: Receipt, admin: false },
+    { to: "/vendors", label: t("nav.vendors"), icon: Users, admin: false },
+    { to: "/audit", label: t("nav.audit"), icon: ScrollText, admin: true },
   ] as const;
-
-  async function signOut() {
-    await queryClient.cancelQueries();
-    queryClient.clear();
-    await supabase.auth.signOut();
-    navigate({ to: "/auth", replace: true });
-  }
 
   return (
     <div className="min-h-screen bg-surface">
@@ -37,28 +29,27 @@ export function AppShell({ children }: { children: ReactNode }) {
             <Brand />
           </Link>
           <nav className="flex items-center gap-1">
-            {nav.map((item) => (
-              <Link
-                key={item.to}
-                to={item.to}
-                className={cn(
-                  "flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                  pathname.startsWith(item.to)
-                    ? "bg-primary/8 text-foreground"
-                    : "text-muted-foreground hover:bg-accent hover:text-foreground",
-                )}
-              >
-                <item.icon className="size-4" />
-                <span className="hidden sm:inline">{item.label}</span>
-              </Link>
-            ))}
+            {nav
+              .filter((item) => !item.admin || isAdmin)
+              .map((item) => (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  className={cn(
+                    "flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                    pathname.startsWith(item.to)
+                      ? "bg-primary/8 text-foreground"
+                      : "text-muted-foreground hover:bg-accent hover:text-foreground",
+                  )}
+                >
+                  <item.icon className="size-4" />
+                  <span className="hidden sm:inline">{item.label}</span>
+                </Link>
+              ))}
           </nav>
           <div className="ms-auto flex items-center gap-2">
             <LanguageSelector />
-            <Button variant="ghost" size="sm" onClick={signOut} className="gap-2">
-              <LogOut className="size-4" />
-              <span className="hidden sm:inline">{t("nav.signOut")}</span>
-            </Button>
+            <ProfileMenu />
           </div>
         </div>
       </header>
