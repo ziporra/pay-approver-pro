@@ -19,6 +19,13 @@ import { useStaffProfile } from "@/lib/staff-profile";
 import { markPasswordChanged, updateMyProfile } from "@/lib/staff.functions";
 import { cn } from "@/lib/utils";
 
+type ProfilePatch = {
+  displayName?: string;
+  locale?: Locale;
+  avatarUrl?: string | null;
+  notificationPrefs?: Record<string, boolean>;
+};
+
 type Tab = "profile" | "security" | "notifications";
 
 export const Route = createFileRoute("/_authenticated/profile")({
@@ -83,8 +90,7 @@ function ProfilePage() {
   const prefs = (profile?.notification_prefs ?? {}) as Record<string, boolean>;
 
   const save = useMutation({
-    mutationFn: (input: Parameters<typeof updateMyProfile>[0]["data"]) =>
-      updateMyProfile({ data: input }),
+    mutationFn: (input: ProfilePatch) => updateMyProfile({ data: input }),
     onSuccess: () => {
       refresh();
       toast.success(t("profile.saved"));
@@ -286,8 +292,14 @@ export function ChangePasswordForm({ onDone }: { onDone?: () => void }) {
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
-    if (next !== confirm) return toast.error(t("security.mismatch"));
-    if (next.length < 10) return toast.error(t("security.tooShort"));
+    if (next !== confirm) {
+      toast.error(t("security.mismatch"));
+      return;
+    }
+    if (next.length < 10) {
+      toast.error(t("security.tooShort"));
+      return;
+    }
     setBusy(true);
     try {
       const { error } = await supabase.auth.updateUser({
