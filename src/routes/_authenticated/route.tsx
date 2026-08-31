@@ -1,7 +1,9 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 
-import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
+import { ForcePasswordChange } from "@/components/ForcePasswordChange";
+import { supabase } from "@/integrations/supabase/client";
+import { StaffProfileProvider } from "@/lib/staff-profile";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
@@ -11,8 +13,11 @@ export const Route = createFileRoute("/_authenticated")({
     return { user: data.user };
   },
   component: () => (
-    <AppShell>
-      <Outlet />
-    </AppShell>
+    <StaffProfileProvider>
+      <AppShell>
+        <ForcePasswordChange />
+        <Outlet />
+      </AppShell>
+    </StaffProfileProvider>
   ),
 });
