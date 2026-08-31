@@ -25,7 +25,6 @@ export const Route = createFileRoute("/auth")({
 function AuthPage() {
   const { t } = useI18n();
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -34,20 +33,9 @@ function AuthPage() {
     event.preventDefault();
     setBusy(true);
     try {
-      if (mode === "signin") {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        navigate({ to: "/dashboard" });
-      } else {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { emailRedirectTo: `${window.location.origin}/dashboard` },
-        });
-        if (error) throw error;
-        toast.success("Account created. An administrator must grant you a role.");
-        setMode("signin");
-      }
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      navigate({ to: "/dashboard" });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : t("common.error"));
     } finally {
@@ -86,7 +74,7 @@ function AuthPage() {
                 <Input
                   id="password"
                   type="password"
-                  autoComplete={mode === "signin" ? "current-password" : "new-password"}
+                  autoComplete="current-password"
                   required
                   minLength={8}
                   value={password}
@@ -94,16 +82,12 @@ function AuthPage() {
                 />
               </div>
               <Button type="submit" className="w-full" disabled={busy}>
-                {mode === "signin" ? t("auth.signIn") : t("auth.signUp")}
+                {t("auth.signIn")}
               </Button>
             </form>
-            <button
-              type="button"
-              className="mt-4 w-full text-center text-sm text-muted-foreground underline-offset-4 hover:underline"
-              onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-            >
-              {mode === "signin" ? t("auth.toggleToSignUp") : t("auth.toggleToSignIn")}
-            </button>
+            <p className="mt-4 text-center text-xs text-muted-foreground">
+              {t("auth.inviteOnly")}
+            </p>
           </CardContent>
         </Card>
       </main>

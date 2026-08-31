@@ -165,6 +165,15 @@ export const decidePaymentRequest = createServerFn({ method: "POST" })
       note: data.note ?? null,
     });
 
+    // Identity-linked, append-only audit entry for the activity timeline.
+    await context.supabase.rpc("write_audit", {
+      _action: data.action,
+      _payment_request_id: data.requestId,
+      _previous_status: current.status,
+      _new_status: nextStatus,
+      _metadata: { note: data.note ?? null, reference: data.reference ?? null },
+    });
+
     if (data.action === "approve" || data.action === "reject") {
       await context.supabase.from("payment_approvals").insert({
         payment_request_id: data.requestId,
@@ -175,4 +184,27 @@ export const decidePaymentRequest = createServerFn({ method: "POST" })
     }
 
     return { status: nextStatus, requestNumber: current.request_number };
+  });
+
+/** Full payment request record for the detail view. */
+export const getPaymentRequestDetail = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => z.object({ requestId: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: request } = await context.supabase
+      .from("payment_requests")
+      .select(
+        "id, request_number, status, amount, currency, category, description, invoice_number, po_reference, due_date, notes, payment_method, invoice_status, possible_duplicate, created_at, submitted_at, approved_at, rejected_at, rejection_reason, paid_at, vendor_id, vendors(vendor_name, email, country)",
+      )
+      .eq("id", data.requestId)
+      .maybeSingle();
+    if (!request) throw new Error("Payment request not found.");
+
+    const { data: documents } = await context.supabase
+      .from("payment_documents")
+      .select("id, doc_type, file_name, mime_type, file_size, created_at")
+      .eq("payment_request_id", data.requestId)
+      .order("created_at", { ascending: false });
+
+    return { request, documents: documents ?? [] };
   });

@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
@@ -222,13 +222,18 @@ function PaymentsPage() {
                     return (
                       <TableRow key={r.id}>
                         <TableCell className="font-mono text-xs">
-                          <span className="flex items-center gap-1.5">
+                          <Link
+                            to="/payments/$id"
+                            params={{ id: r.id }}
+                            className="flex items-center gap-1.5 underline-offset-4 hover:underline"
+                          >
                             {r.request_number}
                             {r.possible_duplicate ? (
                               <AlertTriangle className="size-3.5 text-warning-foreground" />
                             ) : null}
-                          </span>
+                          </Link>
                         </TableCell>
+
                         <TableCell className="font-medium">
                           {r.vendors?.vendor_name ?? "—"}
                         </TableCell>
