@@ -9,9 +9,21 @@ import {
 import { Button } from "@/components/ui/button";
 import { LOCALES, useI18n } from "@/lib/i18n";
 
-export function LanguageSelector({ variant = "ghost" }: { variant?: "ghost" | "outline" }) {
+export function LanguageSelector({
+  variant = "ghost",
+  persist = false,
+}: {
+  variant?: "ghost" | "outline";
+  /** Save the choice to the signed-in staff profile so it follows the user. */
+  persist?: boolean;
+}) {
   const { locale, setLocale } = useI18n();
   const current = LOCALES.find((l) => l.code === locale) ?? LOCALES[0]!;
+
+  function choose(code: (typeof LOCALES)[number]["code"]) {
+    setLocale(code);
+    if (persist) void updateMyProfile({ data: { locale: code } }).catch(() => {});
+  }
 
   return (
     <DropdownMenu>
