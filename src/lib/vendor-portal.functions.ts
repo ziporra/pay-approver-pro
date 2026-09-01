@@ -338,11 +338,22 @@ export const submitPaymentRequest = createServerFn({ method: "POST" })
         due_date: data.request.due_date ?? null,
       },
     });
-    await admin.from("monday_sync_logs").insert({
-      payment_request_id: request.id,
+    // 7. Mirror to Monday.com. Never blocks or fails the submission: the
+    //    dispatcher records every attempt and retries later if Monday is down.
+    const { dispatchMondaySync } = await import("./monday.server");
+    await dispatchMondaySync(admin, { action: "sync_vendor", vendorId });
+    await dispatchMondaySync(admin, {
       action: "create_item",
-      status: "pending",
+      paymentRequestId: request.id,
+      vendorId,
     });
+    if (data.request.invoice_attached) {
+      await dispatchMondaySync(admin, {
+        action: "upload_invoice",
+        paymentRequestId: request.id,
+        vendorId,
+      });
+    }
 
     return {
       requestNumber: request.request_number,
