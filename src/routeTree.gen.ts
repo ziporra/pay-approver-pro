@@ -20,6 +20,7 @@ import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedVendorsRouteImport } from './routes/_authenticated/vendors'
 import { Route as AuthenticatedPaymentsIdRouteImport } from './routes/_authenticated/payments.$id'
 import { Route as ApiPublicBootstrapStaffRouteImport } from './routes/api/public/bootstrap-staff'
+import { Route as ApiPublicMondayRetryRouteImport } from './routes/api/public/monday-retry'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -75,6 +76,11 @@ const ApiPublicBootstrapStaffRoute = ApiPublicBootstrapStaffRouteImport.update({
   path: '/api/public/bootstrap-staff',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicMondayRetryRoute = ApiPublicMondayRetryRouteImport.update({
+  id: '/api/public/monday-retry',
+  path: '/api/public/monday-retry',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -87,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/vendors': typeof AuthenticatedVendorsRoute
   '/payments/$id': typeof AuthenticatedPaymentsIdRoute
   '/api/public/bootstrap-staff': typeof ApiPublicBootstrapStaffRoute
+  '/api/public/monday-retry': typeof ApiPublicMondayRetryRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -99,6 +106,7 @@ export interface FileRoutesByTo {
   '/vendors': typeof AuthenticatedVendorsRoute
   '/payments/$id': typeof AuthenticatedPaymentsIdRoute
   '/api/public/bootstrap-staff': typeof ApiPublicBootstrapStaffRoute
+  '/api/public/monday-retry': typeof ApiPublicMondayRetryRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -113,6 +121,7 @@ export interface FileRoutesById {
   '/_authenticated/vendors': typeof AuthenticatedVendorsRoute
   '/_authenticated/payments/$id': typeof AuthenticatedPaymentsIdRoute
   '/api/public/bootstrap-staff': typeof ApiPublicBootstrapStaffRoute
+  '/api/public/monday-retry': typeof ApiPublicMondayRetryRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -127,6 +136,7 @@ export interface FileRouteTypes {
     | '/vendors'
     | '/payments/$id'
     | '/api/public/bootstrap-staff'
+    | '/api/public/monday-retry'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -139,6 +149,7 @@ export interface FileRouteTypes {
     | '/vendors'
     | '/payments/$id'
     | '/api/public/bootstrap-staff'
+    | '/api/public/monday-retry'
   id:
     | '__root__'
     | '/'
@@ -152,6 +163,7 @@ export interface FileRouteTypes {
     | '/_authenticated/vendors'
     | '/_authenticated/payments/$id'
     | '/api/public/bootstrap-staff'
+    | '/api/public/monday-retry'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -160,6 +172,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   RequestRoute: typeof RequestRoute
   ApiPublicBootstrapStaffRoute: typeof ApiPublicBootstrapStaffRoute
+  ApiPublicMondayRetryRoute: typeof ApiPublicMondayRetryRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -241,6 +254,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicBootstrapStaffRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/monday-retry': {
+      id: '/api/public/monday-retry'
+      path: '/api/public/monday-retry'
+      fullPath: '/api/public/monday-retry'
+      preLoaderRoute: typeof ApiPublicMondayRetryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -282,6 +302,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   RequestRoute: RequestRoute,
   ApiPublicBootstrapStaffRoute: ApiPublicBootstrapStaffRoute,
+  ApiPublicMondayRetryRoute: ApiPublicMondayRetryRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

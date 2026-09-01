@@ -183,6 +183,21 @@ export const decidePaymentRequest = createServerFn({ method: "POST" })
       });
     }
 
+    // Mirror the new state to Monday.com. Sync problems never fail the
+    // decision — the dispatcher logs and retries them separately.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { dispatchMondaySync } = await import("./monday.server");
+    await dispatchMondaySync(supabaseAdmin, {
+      action: "update_item",
+      paymentRequestId: data.requestId,
+    });
+    if (data.action === "invoice_received") {
+      await dispatchMondaySync(supabaseAdmin, {
+        action: "upload_invoice",
+        paymentRequestId: data.requestId,
+      });
+    }
+
     return { status: nextStatus, requestNumber: current.request_number };
   });
 
