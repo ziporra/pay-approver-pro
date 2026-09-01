@@ -229,35 +229,50 @@ export type Database = {
         Row: {
           action: string
           attempts: number
+          board_id: string | null
           created_at: string
+          entity_type: string
           error: string | null
           id: string
           monday_item_id: string | null
+          next_attempt_at: string | null
+          payload: Json
           payment_request_id: string | null
           status: string
           updated_at: string
+          vendor_id: string | null
         }
         Insert: {
           action: string
           attempts?: number
+          board_id?: string | null
           created_at?: string
+          entity_type?: string
           error?: string | null
           id?: string
           monday_item_id?: string | null
+          next_attempt_at?: string | null
+          payload?: Json
           payment_request_id?: string | null
           status?: string
           updated_at?: string
+          vendor_id?: string | null
         }
         Update: {
           action?: string
           attempts?: number
+          board_id?: string | null
           created_at?: string
+          entity_type?: string
           error?: string | null
           id?: string
           monday_item_id?: string | null
+          next_attempt_at?: string | null
+          payload?: Json
           payment_request_id?: string | null
           status?: string
           updated_at?: string
+          vendor_id?: string | null
         }
         Relationships: [
           {
@@ -265,6 +280,13 @@ export type Database = {
             columns: ["payment_request_id"]
             isOneToOne: false
             referencedRelation: "payment_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "monday_sync_logs_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
             referencedColumns: ["id"]
           },
         ]
@@ -462,6 +484,9 @@ export type Database = {
           id: string
           invoice_number: string | null
           invoice_status: Database["public"]["Enums"]["invoice_status"]
+          monday_item_id: string | null
+          monday_sync_status: string
+          monday_synced_at: string | null
           notes: string | null
           paid_at: string | null
           payment_method: Database["public"]["Enums"]["payment_method"]
@@ -491,6 +516,9 @@ export type Database = {
           id?: string
           invoice_number?: string | null
           invoice_status?: Database["public"]["Enums"]["invoice_status"]
+          monday_item_id?: string | null
+          monday_sync_status?: string
+          monday_synced_at?: string | null
           notes?: string | null
           paid_at?: string | null
           payment_method: Database["public"]["Enums"]["payment_method"]
@@ -520,6 +548,9 @@ export type Database = {
           id?: string
           invoice_number?: string | null
           invoice_status?: Database["public"]["Enums"]["invoice_status"]
+          monday_item_id?: string | null
+          monday_sync_status?: string
+          monday_synced_at?: string | null
           notes?: string | null
           paid_at?: string | null
           payment_method?: Database["public"]["Enums"]["payment_method"]
@@ -940,6 +971,8 @@ export type Database = {
           id: string
           internal_notes: string | null
           is_favorite: boolean
+          monday_contact_id: string | null
+          monday_synced_at: string | null
           payment_details_changed: boolean
           payment_details_changed_at: string | null
           phone: string | null
@@ -966,6 +999,8 @@ export type Database = {
           id?: string
           internal_notes?: string | null
           is_favorite?: boolean
+          monday_contact_id?: string | null
+          monday_synced_at?: string | null
           payment_details_changed?: boolean
           payment_details_changed_at?: string | null
           phone?: string | null
@@ -992,6 +1027,8 @@ export type Database = {
           id?: string
           internal_notes?: string | null
           is_favorite?: boolean
+          monday_contact_id?: string | null
+          monday_synced_at?: string | null
           payment_details_changed?: boolean
           payment_details_changed_at?: string | null
           phone?: string | null
