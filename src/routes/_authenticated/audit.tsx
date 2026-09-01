@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
-import { Download, Lock } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Download, Lock, RefreshCw } from "lucide-react";
 import { useState } from "react";
 
 import { UserAvatar } from "@/components/UserAvatar";
@@ -19,6 +19,8 @@ import { Switch } from "@/components/ui/switch";
 import { displayNameFor } from "@/lib/avatar";
 import { useI18n } from "@/lib/i18n";
 import { listAuditLog, listStaff } from "@/lib/staff.functions";
+import { listMondaySyncLogs, retryMondaySyncs } from "@/lib/monday.functions";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/audit")({
   head: () => ({
@@ -246,4 +248,82 @@ function AuditPage() {
     </div>
   );
 
+}
+
+/** Monday.com mirror health: recent operations and an admin retry control. */
+function MondaySyncCard() {
+  const queryClient = useQueryClient();
+  const logs = useQuery({ queryKey: ["monday", "logs"], queryFn: () => listMondaySyncLogs() });
+  const retry = useMutation({
+    mutationFn: () => retryMondaySyncs({ data: {} }),
+    onSuccess: (result) => {
+      toast.success(`Retried ${result.processed} — ${result.succeeded} synced, ${result.failed} still failing.`);
+      void queryClient.invalidateQueries({ queryKey: ["monday", "logs"] });
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
+  const rows = logs.data?.rows ?? [];
+  const pending = rows.filter((r) => r.status === "pending").length;
+  const failed = rows.filter((r) => r.status === "failed").length;
+
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between gap-4">
+        <div>
+          <CardTitle>Monday.com sync</CardTitle>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Payments mirror to the Payments board and vendors to Contacts. No banking credentials are sent —
+            account identifiers are masked to the last four characters.
+          </p>
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => retry.mutate()}
+          disabled={retry.isPending}
+        >
+          <RefreshCw className={retry.isPending ? "size-4 animate-spin" : "size-4"} />
+          Retry pending
+        </Button>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <div className="flex gap-6 text-sm">
+          <span className="text-muted-foreground">
+            Pending: <span className="font-medium text-foreground">{pending}</span>
+          </span>
+          <span className="text-muted-foreground">
+            Failed: <span className="font-medium text-foreground">{failed}</span>
+          </span>
+          <span className="text-muted-foreground">
+            Recent operations: <span className="font-medium text-foreground">{rows.length}</span>
+          </span>
+        </div>
+        <div className="divide-y rounded-md border">
+          {rows.slice(0, 10).map((row) => (
+            <div key={row.id} className="flex items-center justify-between gap-4 px-3 py-2 text-sm">
+              <div className="min-w-0">
+                <p className="font-medium">
+                  {row.action} · {row.entity_type}
+                </p>
+                {row.error ? (
+                  <p className="truncate text-xs text-destructive">{row.error}</p>
+                ) : (
+                  <p className="text-xs text-muted-foreground">
+                    {row.monday_item_id ? `Monday item ${row.monday_item_id}` : "—"}
+                  </p>
+                )}
+              </div>
+              <span className="shrink-0 text-xs text-muted-foreground">
+                {row.status} · {row.attempts} attempt(s)
+              </span>
+            </div>
+          ))}
+          {rows.length === 0 ? (
+            <p className="px-3 py-4 text-sm text-muted-foreground">No synchronizations recorded yet.</p>
+          ) : null}
+        </div>
+      </CardContent>
+    </Card>
+  );
 }
