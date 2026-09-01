@@ -241,7 +241,9 @@ function AuditPage() {
           )}
         </CardContent>
       </Card>
+      <MondaySyncCard />
       <p className="text-xs text-muted-foreground">{t("audit.immutable")}</p>
     </div>
   );
+
 }
