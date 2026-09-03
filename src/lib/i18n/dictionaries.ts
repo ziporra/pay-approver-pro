@@ -220,6 +220,21 @@ const en = {
   "docs.upload": "Upload document",
   "docs.formats": "PDF, JPG, JPEG or PNG · up to 15 MB",
 
+  "ai.title": "Let AI read your invoice",
+  "ai.help": "Upload the invoice and we fill in the details automatically. Check everything before you continue.",
+  "ai.upload": "Upload invoice",
+  "ai.reading": "Reading invoice…",
+  "ai.filled": "Filled by AI",
+  "ai.filledCount": "{count} fields were filled automatically. Complete the rest and review everything.",
+  "ai.missing": "Still needs completion",
+  "ai.bankConfirm": "I verified the bank details above against the invoice.",
+  "ai.bankWarning": "Bank details read from a document must be verified before they can be used.",
+  "ai.staffTitle": "New request from invoice",
+  "ai.staffHelp": "Upload a vendor invoice, review the extracted data and submit the payment request.",
+  "ai.create": "Create request",
+
+
+
   "review.title": "Review your request",
   "review.confirm": "I confirm that the vendor, banking and payment information above is correct.",
   "review.duplicateWarning": "Possible duplicate payment detected. This request will be flagged for review.",
@@ -499,6 +514,21 @@ const he: Partial<Dict> = {
   "docs.upload": "העלאת מסמך",
   "docs.formats": "PDF, JPG, JPEG או PNG · עד 15MB",
 
+  "ai.title": "תנו ל-AI לקרוא את החשבונית",
+  "ai.help": "העלו את החשבונית ואנחנו נמלא את הפרטים אוטומטית. בדקו הכול לפני שממשיכים.",
+  "ai.upload": "העלאת חשבונית",
+  "ai.reading": "קורא את החשבונית…",
+  "ai.filled": "מולא על ידי AI",
+  "ai.filledCount": "{count} שדות מולאו אוטומטית. השלימו את השאר ובדקו הכול.",
+  "ai.missing": "עדיין דרוש מילוי",
+  "ai.bankConfirm": "אימתתי את פרטי הבנק שלמעלה מול החשבונית.",
+  "ai.bankWarning": "יש לאמת פרטי בנק שנקראו ממסמך לפני השימוש בהם.",
+  "ai.staffTitle": "בקשה חדשה מחשבונית",
+  "ai.staffHelp": "העלו חשבונית ספק, בדקו את הנתונים שחולצו ושלחו את בקשת התשלום.",
+  "ai.create": "יצירת בקשה",
+
+
+
   "review.title": "סקירת הבקשה",
   "review.confirm": "אני מאשר שפרטי הספק, הבנק והתשלום שלמעלה נכונים.",
   "review.duplicateWarning": "זוהה תשלום כפול אפשרי. הבקשה תסומן לבדיקה.",
@@ -770,6 +800,20 @@ const es: Partial<Dict> = {
   "docs.upload": "Subir documento",
   "docs.formats": "PDF, JPG, JPEG o PNG · hasta 15 MB",
 
+  "ai.title": "Deja que la IA lea tu factura",
+  "ai.help": "Sube la factura y completamos los datos automáticamente. Revísalo todo antes de continuar.",
+  "ai.upload": "Subir factura",
+  "ai.reading": "Leyendo la factura…",
+  "ai.filled": "Completado por IA",
+  "ai.filledCount": "{count} campos se completaron automáticamente. Completa el resto y revísalo todo.",
+  "ai.missing": "Falta completar",
+  "ai.bankConfirm": "He verificado los datos bancarios anteriores con la factura.",
+  "ai.bankWarning": "Los datos bancarios leídos de un documento deben verificarse antes de usarse.",
+  "ai.staffTitle": "Nueva solicitud desde factura",
+  "ai.staffHelp": "Sube una factura, revisa los datos extraídos y envía la solicitud de pago.",
+  "ai.create": "Crear solicitud",
+
+
   "review.title": "Revisa tu solicitud",
   "review.confirm": "Confirmo que la información del proveedor, bancaria y de pago es correcta.",
   "review.duplicateWarning": "Posible pago duplicado detectado. Esta solicitud se marcará para revisión.",
@@ -1040,6 +1084,20 @@ const zh: Partial<Dict> = {
   "docs.invoiceLater": "付款后再提供发票",
   "docs.upload": "上传文档",
   "docs.formats": "PDF、JPG、JPEG 或 PNG · 最大 15 MB",
+
+  "ai.title": "让 AI 读取发票",
+  "ai.help": "上传发票，我们会自动填写信息。继续前请核对全部内容。",
+  "ai.upload": "上传发票",
+  "ai.reading": "正在读取发票…",
+  "ai.filled": "由 AI 填写",
+  "ai.filledCount": "已自动填写 {count} 个字段，请补全其余内容并核对。",
+  "ai.missing": "仍需补全",
+  "ai.bankConfirm": "我已核对上述银行信息与发票一致。",
+  "ai.bankWarning": "从文档读取的银行信息必须经过核对后才能使用。",
+  "ai.staffTitle": "从发票创建申请",
+  "ai.staffHelp": "上传供应商发票，核对提取的数据并提交付款申请。",
+  "ai.create": "创建申请",
+
 
   "review.title": "核对您的申请",
   "review.confirm": "我确认以上供应商、银行与付款信息准确无误。",

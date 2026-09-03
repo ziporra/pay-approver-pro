@@ -1,10 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useRef, useState } from "react";
-import { AlertTriangle, CheckCircle2, FileUp, Loader2, Search, ShieldCheck } from "lucide-react";
+import { AlertTriangle, CheckCircle2, FileUp, Loader2, Search, ShieldCheck, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 import { Brand } from "@/components/Brand";
+import { InvoiceAiUpload } from "@/components/InvoiceAiUpload";
+import { extractInvoicePublic } from "@/lib/invoice-ai.functions";
+import type { ExtractedInvoice } from "@/lib/invoice-ai.server";
+
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { Field, TextField } from "@/components/wizard/Field";
 import { Stepper } from "@/components/wizard/Stepper";
@@ -152,13 +156,25 @@ const LOCAL_FIELD_LABELS: Record<LocalBankField, string> = {
 
 const MAX_FILE_BYTES = 15 * 1024 * 1024;
 
+/** Map a free-text country from an invoice onto the supported country list. */
+function matchCountry(value: string): string {
+  const needle = value.trim().toLowerCase();
+  if (!needle) return "";
+  return COUNTRIES.find((c) => c.toLowerCase() === needle) ?? "";
+}
+
 function RequestWizard() {
   const { t, locale } = useI18n();
   const lookup = useServerFn(lookupVendorByEmail);
   const search = useServerFn(searchVendorsByName);
   const submit = useServerFn(submitPaymentRequest);
+  const extractAi = useServerFn(extractInvoicePublic);
 
+  const [aiFilled, setAiFilled] = useState<Set<string>>(new Set());
+  const [bankFromAi, setBankFromAi] = useState(false);
+  const [bankVerified, setBankVerified] = useState(false);
   const [step, setStep] = useState(0);
+
   const [vendorId, setVendorId] = useState<string | null>(null);
   const [vendor, setVendor] = useState<VendorForm>(emptyVendor);
   const [payment, setPayment] = useState<PaymentForm>(emptyPayment);
@@ -206,6 +222,125 @@ function RequestWizard() {
   function setPaymentField<K extends keyof PaymentForm>(key: K, value: PaymentForm[K]) {
     setPayment((prev) => ({ ...prev, [key]: value }));
   }
+
+  function applyExtraction(
+    fields: ExtractedInvoice,
+    filled: string[],
+    picked: { name: string; dataUrl: string; size: number },
+  ) {
+    const filledKeys = new Set<string>();
+    const take = (value: string | null, key: string) => {
+      if (!value) return "";
+      filledKeys.add(key);
+      return value;
+    };
+
+    setVendor((prev) => ({
+      ...prev,
+      vendor_name: prev.vendor_name || take(fields.vendor_name, "vendor_name"),
+      beneficiary_name:
+        prev.beneficiary_name ||
+        take(fields.beneficiary_name ?? fields.vendor_name, "beneficiary_name"),
+      contact_first_name: prev.contact_first_name || take(fields.contact_first_name, "contact_first_name"),
+      contact_last_name: prev.contact_last_name || take(fields.contact_last_name, "contact_last_name"),
+      email: prev.email || take(fields.email, "email"),
+      phone: prev.phone || take(fields.phone, "phone"),
+      address_line: prev.address_line || take(fields.address_line, "address_line"),
+      city: prev.city || take(fields.city, "city"),
+      state_province: prev.state_province || take(fields.state_province, "state_province"),
+      postal_code: prev.postal_code || take(fields.postal_code, "postal_code"),
+      country: prev.country || matchCountry(take(fields.country, "country")),
+      registration_number: prev.registration_number || take(fields.registration_number, "registration_number"),
+      tax_id: prev.tax_id || take(fields.tax_id, "tax_id"),
+    }));
+
+    const bankKeys = [
+      "bank_name",
+      "bank_address",
+      "swift_bic",
+      "iban",
+      "account_number",
+      "routing_number",
+      "sort_code",
+      "branch_number",
+      "clabe",
+      "bsb",
+      "transit_number",
+      "local_clearing_code",
+      "intermediary_bank",
+      "paypal_email",
+    ] as const;
+    let touchedBank = false;
+    setPayment((prev) => {
+      const next = { ...prev };
+      if (fields.method) {
+        next.method = fields.method;
+        filledKeys.add("method");
+      } else if (fields.iban || fields.account_number) {
+        next.method = "bank_transfer";
+      } else if (fields.paypal_email) {
+        next.method = "paypal";
+      }
+      for (const key of bankKeys) {
+        const value = fields[key];
+        if (value && !next[key]) {
+          next[key] = value;
+          filledKeys.add(key);
+          touchedBank = true;
+        }
+      }
+      if (!next.bank_country && fields.bank_country) {
+        next.bank_country = matchCountry(fields.bank_country);
+        if (next.bank_country) filledKeys.add("bank_country");
+      }
+      if (!next.beneficiary_name) {
+        const value = fields.beneficiary_name ?? fields.vendor_name;
+        if (value) {
+          next.beneficiary_name = value;
+          filledKeys.add("p_beneficiary_name");
+        }
+      }
+      return next;
+    });
+
+    if (fields.amount && !amount) {
+      setAmount(fields.amount);
+      filledKeys.add("amount");
+    }
+    if (fields.currency && SORTED_CURRENCIES.some((c) => c.code === fields.currency)) {
+      setCurrency(fields.currency);
+      filledKeys.add("currency");
+    }
+    if (fields.description && !description) {
+      setDescription(fields.description);
+      filledKeys.add("description");
+    }
+    if (fields.category && PAYMENT_CATEGORIES.some((c) => c.key === fields.category) && !category) {
+      setCategory(fields.category);
+      filledKeys.add("category");
+    }
+    if (fields.invoice_number && !invoiceNumber) {
+      setInvoiceNumber(fields.invoice_number);
+      filledKeys.add("invoice_number");
+    }
+    if (fields.po_reference && !poReference) {
+      setPoReference(fields.po_reference);
+      filledKeys.add("po_reference");
+    }
+    if (fields.due_date && /^\d{4}-\d{2}-\d{2}$/.test(fields.due_date) && !dueDate) {
+      setDueDate(fields.due_date);
+      filledKeys.add("due_date");
+    }
+
+    setFile(picked);
+    setDocType("invoice");
+    setBankFromAi(touchedBank);
+    setBankVerified(false);
+    setAiFilled(new Set([...filledKeys]));
+    toast.success(t("ai.filledCount", { count: filledKeys.size }));
+    void filled;
+  }
+
 
   async function handleLookup() {
     if (!isValidEmail(lookupEmail)) {
@@ -288,7 +423,9 @@ function RequestWizard() {
           next["account_number"] = t("common.required");
         }
       }
+      if (bankFromAi && !bankVerified) next["bankVerified"] = t("ai.bankWarning");
     }
+
     if (index === 3) {
       const value = Number(amount);
       if (!Number.isFinite(value) || value <= 0) next["amount"] = t("common.required");
@@ -433,10 +570,19 @@ function RequestWizard() {
           <Stepper steps={steps} current={step} />
         </div>
 
+        {aiFilled.size > 0 ? (
+          <div className="mb-4 flex items-start gap-2 rounded-lg border border-primary/30 bg-primary/5 px-4 py-3 text-xs text-muted-foreground">
+            <Sparkles className="mt-0.5 size-3.5 shrink-0 text-primary" />
+            <span>{t("ai.filledCount", { count: aiFilled.size })}</span>
+          </div>
+        ) : null}
+
         <Card className="shadow-panel">
           <CardContent className="space-y-6 py-6">
             {step === 0 ? (
               <div className="space-y-5">
+                <InvoiceAiUpload extract={extractAi} onExtracted={applyExtraction} hint={lookupEmail} />
+
                 <Field
                   label={t("identify.emailLabel")}
                   htmlFor="lookup-email"
@@ -795,11 +941,28 @@ function RequestWizard() {
                   </div>
                 )}
 
+                {bankFromAi ? (
+                  <div className="space-y-2 rounded-lg border border-warning/40 bg-warning/10 p-3">
+                    <p className="text-xs text-warning-foreground">{t("ai.bankWarning")}</p>
+                    <label className="flex items-start gap-2 text-xs">
+                      <Checkbox
+                        checked={bankVerified}
+                        onCheckedChange={(v) => setBankVerified(v === true)}
+                      />
+                      <span>{t("ai.bankConfirm")}</span>
+                    </label>
+                    {errors["bankVerified"] ? (
+                      <p className="text-xs text-destructive">{errors["bankVerified"]}</p>
+                    ) : null}
+                  </div>
+                ) : null}
+
                 <p className="flex items-start gap-2 rounded-lg bg-surface p-3 text-xs text-muted-foreground">
                   <ShieldCheck className="mt-0.5 size-4 shrink-0 text-accent" />
                   Your banking details are stored privately and shown to our finance team in masked
                   form only. Any change to them is flagged for verification.
                 </p>
+
               </div>
             ) : null}
 

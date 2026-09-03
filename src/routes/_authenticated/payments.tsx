@@ -5,7 +5,9 @@ import { useMemo, useState } from "react";
 import { AlertTriangle, Download, Search } from "lucide-react";
 import { toast } from "sonner";
 
+import { NewRequestFromInvoice } from "@/components/NewRequestFromInvoice";
 import { StatusBadge } from "@/components/StatusBadge";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -185,10 +187,14 @@ function PaymentsPage() {
               ))}
             </SelectContent>
           </Select>
+          <NewRequestFromInvoice
+            onCreated={() => queryClient.invalidateQueries({ queryKey: ["payment-requests"] })}
+          />
           <Button variant="outline" onClick={exportCsv} className="gap-2">
             <Download className="size-4" />
             {t("table.export")}
           </Button>
+
         </div>
       </div>
 
