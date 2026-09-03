@@ -216,6 +216,125 @@ function RequestWizard() {
     setPayment((prev) => ({ ...prev, [key]: value }));
   }
 
+  function applyExtraction(
+    fields: ExtractedInvoice,
+    filled: string[],
+    picked: { name: string; dataUrl: string; size: number },
+  ) {
+    const filledKeys = new Set<string>();
+    const take = (value: string | null, key: string) => {
+      if (!value) return "";
+      filledKeys.add(key);
+      return value;
+    };
+
+    setVendor((prev) => ({
+      ...prev,
+      vendor_name: prev.vendor_name || take(fields.vendor_name, "vendor_name"),
+      beneficiary_name:
+        prev.beneficiary_name ||
+        take(fields.beneficiary_name ?? fields.vendor_name, "beneficiary_name"),
+      contact_first_name: prev.contact_first_name || take(fields.contact_first_name, "contact_first_name"),
+      contact_last_name: prev.contact_last_name || take(fields.contact_last_name, "contact_last_name"),
+      email: prev.email || take(fields.email, "email"),
+      phone: prev.phone || take(fields.phone, "phone"),
+      address_line: prev.address_line || take(fields.address_line, "address_line"),
+      city: prev.city || take(fields.city, "city"),
+      state_province: prev.state_province || take(fields.state_province, "state_province"),
+      postal_code: prev.postal_code || take(fields.postal_code, "postal_code"),
+      country: prev.country || matchCountry(take(fields.country, "country")),
+      registration_number: prev.registration_number || take(fields.registration_number, "registration_number"),
+      tax_id: prev.tax_id || take(fields.tax_id, "tax_id"),
+    }));
+
+    const bankKeys = [
+      "bank_name",
+      "bank_address",
+      "swift_bic",
+      "iban",
+      "account_number",
+      "routing_number",
+      "sort_code",
+      "branch_number",
+      "clabe",
+      "bsb",
+      "transit_number",
+      "local_clearing_code",
+      "intermediary_bank",
+      "paypal_email",
+    ] as const;
+    let touchedBank = false;
+    setPayment((prev) => {
+      const next = { ...prev };
+      if (fields.method) {
+        next.method = fields.method;
+        filledKeys.add("method");
+      } else if (fields.iban || fields.account_number) {
+        next.method = "bank_transfer";
+      } else if (fields.paypal_email) {
+        next.method = "paypal";
+      }
+      for (const key of bankKeys) {
+        const value = fields[key];
+        if (value && !next[key]) {
+          next[key] = value;
+          filledKeys.add(key);
+          touchedBank = true;
+        }
+      }
+      if (!next.bank_country && fields.bank_country) {
+        next.bank_country = matchCountry(fields.bank_country);
+        if (next.bank_country) filledKeys.add("bank_country");
+      }
+      if (!next.beneficiary_name) {
+        const value = fields.beneficiary_name ?? fields.vendor_name;
+        if (value) {
+          next.beneficiary_name = value;
+          filledKeys.add("p_beneficiary_name");
+        }
+      }
+      return next;
+    });
+
+    if (fields.amount && !amount) {
+      setAmount(fields.amount);
+      filledKeys.add("amount");
+    }
+    if (fields.currency && SORTED_CURRENCIES.some((c) => c.code === fields.currency)) {
+      setCurrency(fields.currency);
+      filledKeys.add("currency");
+    }
+    if (fields.description && !description) {
+      setDescription(fields.description);
+      filledKeys.add("description");
+    }
+    if (fields.category && PAYMENT_CATEGORIES.some((c) => c.key === fields.category) && !category) {
+      setCategory(fields.category);
+      filledKeys.add("category");
+    }
+    if (fields.invoice_number && !invoiceNumber) {
+      setInvoiceNumber(fields.invoice_number);
+      filledKeys.add("invoice_number");
+    }
+    if (fields.po_reference && !poReference) {
+      setPoReference(fields.po_reference);
+      filledKeys.add("po_reference");
+    }
+    if (fields.due_date && /^\d{4}-\d{2}-\d{2}$/.test(fields.due_date) && !dueDate) {
+      setDueDate(fields.due_date);
+      filledKeys.add("due_date");
+    }
+
+    setFile(picked);
+    setDocType("invoice");
+    setBankFromAi(touchedBank);
+    setBankVerified(false);
+    setAiFilled(new Set([...filledKeys]));
+    toast.success(t("ai.filledCount", { count: filledKeys.size }));
+    void filled;
+  }
+
+
   async function handleLookup() {
     if (!isValidEmail(lookupEmail)) {
       setErrors({ lookupEmail: t("common.required") });
