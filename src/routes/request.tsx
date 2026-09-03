@@ -423,7 +423,9 @@ function RequestWizard() {
           next["account_number"] = t("common.required");
         }
       }
+      if (bankFromAi && !bankVerified) next["bankVerified"] = t("ai.bankWarning");
     }
+
     if (index === 3) {
       const value = Number(amount);
       if (!Number.isFinite(value) || value <= 0) next["amount"] = t("common.required");
