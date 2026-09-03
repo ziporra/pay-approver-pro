@@ -92,15 +92,32 @@ function VendorsPage() {
               </TableHeader>
               <TableBody>
                 {rows.map((v) => (
-                  <TableRow key={v.id}>
+                  <TableRow key={v.id} className={v.profile_complete ? undefined : "bg-destructive/5"}>
                     <TableCell className="font-medium">
-                      <span className="flex items-center gap-2">
+                      <span className="flex flex-wrap items-center gap-2">
                         {v.vendor_name}
                         {v.payment_details_changed ? (
                           <AlertTriangle className="size-3.5 text-warning-foreground" />
                         ) : null}
+                        {v.profile_complete ? null : (
+                          <span className="rounded-full border border-destructive/50 bg-destructive/10 px-2 py-0.5 text-[10px] font-medium text-destructive">
+                            {t("vp.incomplete")}
+                          </span>
+                        )}
                       </span>
+                      {v.profile_complete ? null : (
+                        <p className="mt-1 text-[11px] text-destructive">
+                          {t("vp.missingList", {
+                            fields: v.missing_fields
+                              .map((f: string) =>
+                                t((VENDOR_FIELD_LABEL_KEYS[f] ?? f) as Parameters<typeof t>[0]),
+                              )
+                              .join(", "),
+                          })}
+                        </p>
+                      )}
                     </TableCell>
+
                     <TableCell className="text-muted-foreground">{v.beneficiary_name}</TableCell>
                     <TableCell className="font-mono text-xs">{maskEmail(v.email)}</TableCell>
                     <TableCell className="text-muted-foreground">{v.country ?? "—"}</TableCell>
