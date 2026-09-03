@@ -941,11 +941,28 @@ function RequestWizard() {
                   </div>
                 )}
 
+                {bankFromAi ? (
+                  <div className="space-y-2 rounded-lg border border-warning/40 bg-warning/10 p-3">
+                    <p className="text-xs text-warning-foreground">{t("ai.bankWarning")}</p>
+                    <label className="flex items-start gap-2 text-xs">
+                      <Checkbox
+                        checked={bankVerified}
+                        onCheckedChange={(v) => setBankVerified(v === true)}
+                      />
+                      <span>{t("ai.bankConfirm")}</span>
+                    </label>
+                    {errors["bankVerified"] ? (
+                      <p className="text-xs text-destructive">{errors["bankVerified"]}</p>
+                    ) : null}
+                  </div>
+                ) : null}
+
                 <p className="flex items-start gap-2 rounded-lg bg-surface p-3 text-xs text-muted-foreground">
                   <ShieldCheck className="mt-0.5 size-4 shrink-0 text-accent" />
                   Your banking details are stored privately and shown to our finance team in masked
                   form only. Any change to them is flagged for verification.
                 </p>
+
               </div>
             ) : null}
 
