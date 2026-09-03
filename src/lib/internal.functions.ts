@@ -38,10 +38,11 @@ export const listPaymentRequests = createServerFn({ method: "GET" })
     return { rows: data ?? [], error: null };
   });
 
-/** Vendor directory for internal users. */
+/** Vendor directory for internal users, including profile completeness. */
 export const listVendors = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
+    const { missingVendorFields } = await import("./vendor-completeness");
     const { data, error } = await context.supabase
       .from("vendors")
       .select(
@@ -50,8 +51,150 @@ export const listVendors = createServerFn({ method: "GET" })
       .order("vendor_name")
       .limit(500);
     if (error) return { rows: [], error: error.message };
-    return { rows: data ?? [], error: null };
+
+    const rows = data ?? [];
+    const { data: banks } = await context.supabase
+      .from("vendor_bank_accounts")
+      .select("vendor_id, method, paypal_email, bank_name, bank_country, swift_bic, iban, account_number")
+      .eq("is_active", true)
+      .in(
+        "vendor_id",
+        rows.map((r) => r.id),
+      );
+    const bankByVendor = new Map((banks ?? []).map((b) => [b.vendor_id, b]));
+
+    return {
+      rows: rows.map((vendor) => {
+        const bank = bankByVendor.get(vendor.id) ?? null;
+        const missing = missingVendorFields({
+          ...vendor,
+          method: bank?.method ?? vendor.preferred_payment_method ?? null,
+          paypal_email: bank?.paypal_email ?? null,
+          bank_name: bank?.bank_name ?? null,
+          bank_country: bank?.bank_country ?? null,
+          swift_bic: bank?.swift_bic ?? null,
+          iban: bank?.iban ?? null,
+          account_number: bank?.account_number ?? null,
+        });
+        return { ...vendor, missing_fields: missing, profile_complete: missing.length === 0 };
+      }),
+      error: null,
+    };
   });
+
+const matchSchema = z.object({
+  vendor_name: z.string().max(200).optional().nullable(),
+  beneficiary_name: z.string().max(200).optional().nullable(),
+  email: z.string().max(200).optional().nullable(),
+  tax_id: z.string().max(80).optional().nullable(),
+  registration_number: z.string().max(80).optional().nullable(),
+});
+
+export type VendorMatch = {
+  id: string;
+  vendorName: string;
+  beneficiaryName: string;
+  email: string;
+  country: string | null;
+  taxId: string | null;
+  matchType: "exact" | "similar";
+  missing: string[];
+  profile: {
+    vendor_name: string;
+    beneficiary_name: string;
+    email: string;
+    country: string | null;
+    method: "paypal" | "bank_transfer" | null;
+    paypal_email: string | null;
+    bank_name: string | null;
+    bank_country: string | null;
+    swift_bic: string | null;
+    iban: string | null;
+    account_number: string | null;
+  };
+};
+
+/** Find vendors that match an invoice: exact by email / tax id, similar by company name. */
+export const matchVendorsFromInvoice = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => matchSchema.parse(data))
+  .handler(async ({ data, context }): Promise<{ matches: VendorMatch[] }> => {
+    const { missingVendorFields } = await import("./vendor-completeness");
+    const esc = (v: string) => v.replace(/[%_,()]/g, "").trim();
+
+    const filters: string[] = [];
+    if (data.email) filters.push(`email.ilike.${esc(data.email)}`);
+    if (data.tax_id) filters.push(`tax_id.ilike.${esc(data.tax_id)}`);
+    if (data.registration_number)
+      filters.push(`registration_number.ilike.${esc(data.registration_number)}`);
+    if (data.vendor_name && esc(data.vendor_name).length >= 3)
+      filters.push(`vendor_name.ilike.%${esc(data.vendor_name)}%`);
+    if (data.beneficiary_name && esc(data.beneficiary_name).length >= 3)
+      filters.push(`beneficiary_name.ilike.%${esc(data.beneficiary_name)}%`);
+    if (filters.length === 0) return { matches: [] };
+
+    const { data: rows } = await context.supabase
+      .from("vendors")
+      .select(
+        "id, vendor_name, beneficiary_name, email, country, tax_id, registration_number, preferred_payment_method",
+      )
+      .or(filters.join(","))
+      .limit(5);
+    if (!rows || rows.length === 0) return { matches: [] };
+
+    const { data: banks } = await context.supabase
+      .from("vendor_bank_accounts")
+      .select("vendor_id, method, paypal_email, bank_name, bank_country, swift_bic, iban, account_number")
+      .eq("is_active", true)
+      .in(
+        "vendor_id",
+        rows.map((r) => r.id),
+      );
+    const bankByVendor = new Map((banks ?? []).map((b) => [b.vendor_id, b]));
+
+    const norm = (v: string | null | undefined) => (v ?? "").toLowerCase().trim();
+    const matches: VendorMatch[] = rows.map((vendor) => {
+      const bank = bankByVendor.get(vendor.id) ?? null;
+      const profile = {
+        vendor_name: vendor.vendor_name,
+        beneficiary_name: vendor.beneficiary_name,
+        email: vendor.email,
+        country: vendor.country,
+        method: (bank?.method ?? vendor.preferred_payment_method ?? null) as
+          | "paypal"
+          | "bank_transfer"
+          | null,
+        paypal_email: bank?.paypal_email ?? null,
+        bank_name: bank?.bank_name ?? null,
+        bank_country: bank?.bank_country ?? null,
+        swift_bic: bank?.swift_bic ?? null,
+        iban: bank?.iban ?? null,
+        account_number: bank?.account_number ?? null,
+      };
+      const exact =
+        (!!data.email && norm(data.email) === norm(vendor.email)) ||
+        (!!data.tax_id && !!vendor.tax_id && norm(data.tax_id) === norm(vendor.tax_id)) ||
+        (!!data.registration_number &&
+          !!vendor.registration_number &&
+          norm(data.registration_number) === norm(vendor.registration_number)) ||
+        (!!data.vendor_name && norm(data.vendor_name) === norm(vendor.vendor_name));
+      return {
+        id: vendor.id,
+        vendorName: vendor.vendor_name,
+        beneficiaryName: vendor.beneficiary_name,
+        email: vendor.email,
+        country: vendor.country,
+        taxId: vendor.tax_id,
+        matchType: exact ? ("exact" as const) : ("similar" as const),
+        missing: missingVendorFields(profile),
+        profile,
+      };
+    });
+
+    matches.sort((a, b) => (a.matchType === b.matchType ? 0 : a.matchType === "exact" ? -1 : 1));
+    return { matches };
+  });
+
 
 /** Vendor card: profile, ledger totals per currency and payment history. */
 export const getVendorLedger = createServerFn({ method: "POST" })
