@@ -541,6 +541,21 @@ const he: Partial<Dict> = {
   "ai.staffTitle": "בקשה חדשה מחשבונית",
   "ai.staffHelp": "העלו חשבונית ספק, בדקו את הנתונים שחולצו ושלחו את בקשת התשלום.",
   "ai.create": "יצירת בקשה",
+  "vp.stepVendor": "פרופיל ספק",
+  "vp.stepRequest": "דרישת תשלום",
+  "vp.matchFound": "זוהה ספק קיים במערכת",
+  "vp.matchHelp": "בחירה בספק קיים — נשאר רק למלא את דרישת התשלום.",
+  "vp.useVendor": "בחר ספק זה",
+  "vp.createNew": "הקמת פרופיל ספק חדש",
+  "vp.existing": "ספק קיים",
+  "vp.similar": "שם דומה",
+  "vp.incomplete": "פרופיל הספק חסר",
+  "vp.incompleteHelp": "חובה להשלים את הפרטים החסרים לפני שאפשר ליצור דרישת תשלום.",
+  "vp.missingList": "חסר: {fields}",
+  "vp.continue": "המשך",
+  "vp.back": "חזרה",
+  "vp.blocked": "יש להשלים תחילה את פרטי הספק.",
+
 
 
 
