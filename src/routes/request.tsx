@@ -433,10 +433,19 @@ function RequestWizard() {
           <Stepper steps={steps} current={step} />
         </div>
 
+        {aiFilled.size > 0 ? (
+          <div className="mb-4 flex items-start gap-2 rounded-lg border border-primary/30 bg-primary/5 px-4 py-3 text-xs text-muted-foreground">
+            <Sparkles className="mt-0.5 size-3.5 shrink-0 text-primary" />
+            <span>{t("ai.filledCount", { count: aiFilled.size })}</span>
+          </div>
+        ) : null}
+
         <Card className="shadow-panel">
           <CardContent className="space-y-6 py-6">
             {step === 0 ? (
               <div className="space-y-5">
+                <InvoiceAiUpload extract={extractAi} onExtracted={applyExtraction} hint={lookupEmail} />
+
                 <Field
                   label={t("identify.emailLabel")}
                   htmlFor="lookup-email"
