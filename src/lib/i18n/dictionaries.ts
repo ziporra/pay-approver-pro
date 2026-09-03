@@ -1097,6 +1097,21 @@ const zh: Partial<Dict> = {
   "ai.staffTitle": "从发票创建申请",
   "ai.staffHelp": "上传供应商发票，核对提取的数据并提交付款申请。",
   "ai.create": "创建申请",
+  "vp.stepVendor": "供应商资料",
+  "vp.stepRequest": "付款申请",
+  "vp.matchFound": "系统识别到已存在的供应商",
+  "vp.matchHelp": "选择现有供应商后只需填写付款申请。",
+  "vp.useVendor": "使用该供应商",
+  "vp.createNew": "创建新的供应商资料",
+  "vp.existing": "现有供应商",
+  "vp.similar": "名称相似",
+  "vp.incomplete": "供应商资料不完整",
+  "vp.incompleteHelp": "在创建付款申请之前，必须补齐以下缺失信息。",
+  "vp.missingList": "缺失：{fields}",
+  "vp.continue": "继续",
+  "vp.back": "返回",
+  "vp.blocked": "请先补齐供应商资料。",
+
 
 
   "review.title": "核对您的申请",
