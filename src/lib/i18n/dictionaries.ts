@@ -1085,6 +1085,20 @@ const zh: Partial<Dict> = {
   "docs.upload": "上传文档",
   "docs.formats": "PDF、JPG、JPEG 或 PNG · 最大 15 MB",
 
+  "ai.title": "让 AI 读取发票",
+  "ai.help": "上传发票，我们会自动填写信息。继续前请核对全部内容。",
+  "ai.upload": "上传发票",
+  "ai.reading": "正在读取发票…",
+  "ai.filled": "由 AI 填写",
+  "ai.filledCount": "已自动填写 {count} 个字段，请补全其余内容并核对。",
+  "ai.missing": "仍需补全",
+  "ai.bankConfirm": "我已核对上述银行信息与发票一致。",
+  "ai.bankWarning": "从文档读取的银行信息必须经过核对后才能使用。",
+  "ai.staffTitle": "从发票创建申请",
+  "ai.staffHelp": "上传供应商发票，核对提取的数据并提交付款申请。",
+  "ai.create": "创建申请",
+
+
   "review.title": "核对您的申请",
   "review.confirm": "我确认以上供应商、银行与付款信息准确无误。",
   "review.duplicateWarning": "检测到可能的重复付款，此申请将被标记复核。",
