@@ -4,7 +4,9 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { AlertTriangle, Search } from "lucide-react";
 
+import { VENDOR_FIELD_LABEL_KEYS } from "@/lib/vendor-completeness";
 import { Card, CardContent } from "@/components/ui/card";
+
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
