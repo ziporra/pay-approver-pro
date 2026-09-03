@@ -232,6 +232,21 @@ const en = {
   "ai.staffTitle": "New request from invoice",
   "ai.staffHelp": "Upload a vendor invoice, review the extracted data and submit the payment request.",
   "ai.create": "Create request",
+  "vp.stepVendor": "Vendor profile",
+  "vp.stepRequest": "Payment request",
+  "vp.matchFound": "An existing vendor was recognised",
+  "vp.matchHelp": "Pick the existing vendor and only the payment request has to be filled in.",
+  "vp.useVendor": "Use this vendor",
+  "vp.createNew": "Create a new vendor profile",
+  "vp.existing": "Existing vendor",
+  "vp.similar": "Similar name",
+  "vp.incomplete": "Incomplete vendor profile",
+  "vp.incompleteHelp": "The missing details below must be completed before a payment request can be created.",
+  "vp.missingList": "Missing: {fields}",
+  "vp.continue": "Continue",
+  "vp.back": "Back",
+  "vp.blocked": "Complete the vendor profile first.",
+
 
 
 
