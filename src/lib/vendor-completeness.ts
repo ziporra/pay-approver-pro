@@ -1,17 +1,17 @@
 /** Shared rules that decide whether a vendor profile is complete enough to be paid. */
 
 export type VendorProfileCheck = {
-  vendor_name?: string | null;
-  beneficiary_name?: string | null;
-  email?: string | null;
-  country?: string | null;
-  method?: "paypal" | "bank_transfer" | null;
-  paypal_email?: string | null;
-  bank_name?: string | null;
-  bank_country?: string | null;
-  swift_bic?: string | null;
-  iban?: string | null;
-  account_number?: string | null;
+  vendor_name?: string | null | undefined;
+  beneficiary_name?: string | null | undefined;
+  email?: string | null | undefined;
+  country?: string | null | undefined;
+  method?: "paypal" | "bank_transfer" | null | undefined;
+  paypal_email?: string | null | undefined;
+  bank_name?: string | null | undefined;
+  bank_country?: string | null | undefined;
+  swift_bic?: string | null | undefined;
+  iban?: string | null | undefined;
+  account_number?: string | null | undefined;
 };
 
 /** i18n keys used to label a missing field in the UI. */
