@@ -102,7 +102,7 @@ export function NewRequestFromInvoice({ onCreated }: { onCreated: () => void }) 
 
   function missingLabel(fields: string[]) {
     return t("vp.missingList", {
-      fields: fields.map((f) => t(VENDOR_FIELD_LABEL_KEYS[f] ?? f)).join(", "),
+      fields: fields.map((f) => t((VENDOR_FIELD_LABEL_KEYS[f] ?? f) as Parameters<typeof t>[0])).join(", "),
     });
   }
 
