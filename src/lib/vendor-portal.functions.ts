@@ -171,10 +171,18 @@ export const submitPaymentRequest = createServerFn({ method: "POST" })
     const { getAdmin, enforceRateLimit, hashKey, decodeUpload, diffSensitive, nullify } = await import(
       "./vendor-portal.server"
     );
+    const { missingVendorFields } = await import("./vendor-completeness");
     const admin = await getAdmin();
     await enforceRateLimit(admin, hashKey(data.vendor.email), "submit", 6, 3600);
 
+    // Vendor profile must be complete (base details + payment details) before a request exists.
+    const missing = missingVendorFields({ ...data.vendor, ...data.payment });
+    if (missing.length > 0) {
+      throw new Error(`The vendor profile is incomplete: ${missing.join(", ")}`);
+    }
+
     const { bytes, mime } = decodeUpload(data.document.dataUrl);
+
 
     // 1. Resolve or create the vendor master record.
     let vendorId = data.vendorId;
