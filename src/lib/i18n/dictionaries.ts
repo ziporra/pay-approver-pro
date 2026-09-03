@@ -220,6 +220,21 @@ const en = {
   "docs.upload": "Upload document",
   "docs.formats": "PDF, JPG, JPEG or PNG · up to 15 MB",
 
+  "ai.title": "Let AI read your invoice",
+  "ai.help": "Upload the invoice and we fill in the details automatically. Check everything before you continue.",
+  "ai.upload": "Upload invoice",
+  "ai.reading": "Reading invoice…",
+  "ai.filled": "Filled by AI",
+  "ai.filledCount": "{count} fields were filled automatically. Complete the rest and review everything.",
+  "ai.missing": "Still needs completion",
+  "ai.bankConfirm": "I verified the bank details above against the invoice.",
+  "ai.bankWarning": "Bank details read from a document must be verified before they can be used.",
+  "ai.staffTitle": "New request from invoice",
+  "ai.staffHelp": "Upload a vendor invoice, review the extracted data and submit the payment request.",
+  "ai.create": "Create request",
+
+
+
   "review.title": "Review your request",
   "review.confirm": "I confirm that the vendor, banking and payment information above is correct.",
   "review.duplicateWarning": "Possible duplicate payment detected. This request will be flagged for review.",
