@@ -471,7 +471,7 @@ export function NewRequestFromInvoice({ onCreated }: { onCreated: () => void }) 
             </div>
             <TextField
               id="ai-amount"
-              label={t("req.amount")}
+              label={t("request.amount")}
               value={draft.amount}
               onChange={(v) => set("amount", v)}
               error={errors["amount"]}
@@ -479,7 +479,7 @@ export function NewRequestFromInvoice({ onCreated }: { onCreated: () => void }) 
             />
             <TextField
               id="ai-currency"
-              label={t("req.currency")}
+              label={t("request.currency")}
               value={draft.currency}
               onChange={(v) => set("currency", v.toUpperCase().slice(0, 3))}
               required
@@ -487,7 +487,7 @@ export function NewRequestFromInvoice({ onCreated }: { onCreated: () => void }) 
             <TextField
               id="ai-description"
               className="sm:col-span-2"
-              label={t("req.description")}
+              label={t("request.description")}
               value={draft.description}
               onChange={(v) => set("description", v)}
               error={errors["description"]}
@@ -495,13 +495,13 @@ export function NewRequestFromInvoice({ onCreated }: { onCreated: () => void }) 
             />
             <TextField
               id="ai-invoice"
-              label={t("req.invoiceNumber")}
+              label={t("request.invoiceNumber")}
               value={draft.invoice_number}
               onChange={(v) => set("invoice_number", v)}
             />
             <TextField
               id="ai-due"
-              label={t("req.dueDate")}
+              label={t("request.dueDate")}
               type="date"
               value={draft.due_date}
               onChange={(v) => set("due_date", v)}
