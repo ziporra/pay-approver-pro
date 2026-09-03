@@ -842,6 +842,21 @@ const es: Partial<Dict> = {
   "ai.staffTitle": "Nueva solicitud desde factura",
   "ai.staffHelp": "Sube una factura, revisa los datos extraídos y envía la solicitud de pago.",
   "ai.create": "Crear solicitud",
+  "vp.stepVendor": "Perfil del proveedor",
+  "vp.stepRequest": "Solicitud de pago",
+  "vp.matchFound": "Se reconoció un proveedor existente",
+  "vp.matchHelp": "Elige el proveedor existente y solo faltará la solicitud de pago.",
+  "vp.useVendor": "Usar este proveedor",
+  "vp.createNew": "Crear un nuevo perfil de proveedor",
+  "vp.existing": "Proveedor existente",
+  "vp.similar": "Nombre similar",
+  "vp.incomplete": "Perfil de proveedor incompleto",
+  "vp.incompleteHelp": "Los datos que faltan deben completarse antes de crear una solicitud de pago.",
+  "vp.missingList": "Falta: {fields}",
+  "vp.continue": "Continuar",
+  "vp.back": "Atrás",
+  "vp.blocked": "Completa primero el perfil del proveedor.",
+
 
 
   "review.title": "Revisa tu solicitud",
