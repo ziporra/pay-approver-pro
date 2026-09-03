@@ -232,6 +232,21 @@ const en = {
   "ai.staffTitle": "New request from invoice",
   "ai.staffHelp": "Upload a vendor invoice, review the extracted data and submit the payment request.",
   "ai.create": "Create request",
+  "vp.stepVendor": "Vendor profile",
+  "vp.stepRequest": "Payment request",
+  "vp.matchFound": "An existing vendor was recognised",
+  "vp.matchHelp": "Pick the existing vendor and only the payment request has to be filled in.",
+  "vp.useVendor": "Use this vendor",
+  "vp.createNew": "Create a new vendor profile",
+  "vp.existing": "Existing vendor",
+  "vp.similar": "Similar name",
+  "vp.incomplete": "Incomplete vendor profile",
+  "vp.incompleteHelp": "The missing details below must be completed before a payment request can be created.",
+  "vp.missingList": "Missing: {fields}",
+  "vp.continue": "Continue",
+  "vp.back": "Back",
+  "vp.blocked": "Complete the vendor profile first.",
+
 
 
 
@@ -526,6 +541,21 @@ const he: Partial<Dict> = {
   "ai.staffTitle": "בקשה חדשה מחשבונית",
   "ai.staffHelp": "העלו חשבונית ספק, בדקו את הנתונים שחולצו ושלחו את בקשת התשלום.",
   "ai.create": "יצירת בקשה",
+  "vp.stepVendor": "פרופיל ספק",
+  "vp.stepRequest": "דרישת תשלום",
+  "vp.matchFound": "זוהה ספק קיים במערכת",
+  "vp.matchHelp": "בחירה בספק קיים — נשאר רק למלא את דרישת התשלום.",
+  "vp.useVendor": "בחר ספק זה",
+  "vp.createNew": "הקמת פרופיל ספק חדש",
+  "vp.existing": "ספק קיים",
+  "vp.similar": "שם דומה",
+  "vp.incomplete": "פרופיל הספק חסר",
+  "vp.incompleteHelp": "חובה להשלים את הפרטים החסרים לפני שאפשר ליצור דרישת תשלום.",
+  "vp.missingList": "חסר: {fields}",
+  "vp.continue": "המשך",
+  "vp.back": "חזרה",
+  "vp.blocked": "יש להשלים תחילה את פרטי הספק.",
+
 
 
 
@@ -812,6 +842,21 @@ const es: Partial<Dict> = {
   "ai.staffTitle": "Nueva solicitud desde factura",
   "ai.staffHelp": "Sube una factura, revisa los datos extraídos y envía la solicitud de pago.",
   "ai.create": "Crear solicitud",
+  "vp.stepVendor": "Perfil del proveedor",
+  "vp.stepRequest": "Solicitud de pago",
+  "vp.matchFound": "Se reconoció un proveedor existente",
+  "vp.matchHelp": "Elige el proveedor existente y solo faltará la solicitud de pago.",
+  "vp.useVendor": "Usar este proveedor",
+  "vp.createNew": "Crear un nuevo perfil de proveedor",
+  "vp.existing": "Proveedor existente",
+  "vp.similar": "Nombre similar",
+  "vp.incomplete": "Perfil de proveedor incompleto",
+  "vp.incompleteHelp": "Los datos que faltan deben completarse antes de crear una solicitud de pago.",
+  "vp.missingList": "Falta: {fields}",
+  "vp.continue": "Continuar",
+  "vp.back": "Atrás",
+  "vp.blocked": "Completa primero el perfil del proveedor.",
+
 
 
   "review.title": "Revisa tu solicitud",
@@ -1097,6 +1142,21 @@ const zh: Partial<Dict> = {
   "ai.staffTitle": "从发票创建申请",
   "ai.staffHelp": "上传供应商发票，核对提取的数据并提交付款申请。",
   "ai.create": "创建申请",
+  "vp.stepVendor": "供应商资料",
+  "vp.stepRequest": "付款申请",
+  "vp.matchFound": "系统识别到已存在的供应商",
+  "vp.matchHelp": "选择现有供应商后只需填写付款申请。",
+  "vp.useVendor": "使用该供应商",
+  "vp.createNew": "创建新的供应商资料",
+  "vp.existing": "现有供应商",
+  "vp.similar": "名称相似",
+  "vp.incomplete": "供应商资料不完整",
+  "vp.incompleteHelp": "在创建付款申请之前，必须补齐以下缺失信息。",
+  "vp.missingList": "缺失：{fields}",
+  "vp.continue": "继续",
+  "vp.back": "返回",
+  "vp.blocked": "请先补齐供应商资料。",
+
 
 
   "review.title": "核对您的申请",
