@@ -161,8 +161,13 @@ function RequestWizard() {
   const lookup = useServerFn(lookupVendorByEmail);
   const search = useServerFn(searchVendorsByName);
   const submit = useServerFn(submitPaymentRequest);
+  const extractAi = useServerFn(extractInvoicePublic);
 
+  const [aiFilled, setAiFilled] = useState<Set<string>>(new Set());
+  const [bankFromAi, setBankFromAi] = useState(false);
+  const [bankVerified, setBankVerified] = useState(false);
   const [step, setStep] = useState(0);
+
   const [vendorId, setVendorId] = useState<string | null>(null);
   const [vendor, setVendor] = useState<VendorForm>(emptyVendor);
   const [payment, setPayment] = useState<PaymentForm>(emptyPayment);
