@@ -800,6 +800,20 @@ const es: Partial<Dict> = {
   "docs.upload": "Subir documento",
   "docs.formats": "PDF, JPG, JPEG o PNG · hasta 15 MB",
 
+  "ai.title": "Deja que la IA lea tu factura",
+  "ai.help": "Sube la factura y completamos los datos automáticamente. Revísalo todo antes de continuar.",
+  "ai.upload": "Subir factura",
+  "ai.reading": "Leyendo la factura…",
+  "ai.filled": "Completado por IA",
+  "ai.filledCount": "{count} campos se completaron automáticamente. Completa el resto y revísalo todo.",
+  "ai.missing": "Falta completar",
+  "ai.bankConfirm": "He verificado los datos bancarios anteriores con la factura.",
+  "ai.bankWarning": "Los datos bancarios leídos de un documento deben verificarse antes de usarse.",
+  "ai.staffTitle": "Nueva solicitud desde factura",
+  "ai.staffHelp": "Sube una factura, revisa los datos extraídos y envía la solicitud de pago.",
+  "ai.create": "Crear solicitud",
+
+
   "review.title": "Revisa tu solicitud",
   "review.confirm": "Confirmo que la información del proveedor, bancaria y de pago es correcta.",
   "review.duplicateWarning": "Posible pago duplicado detectado. Esta solicitud se marcará para revisión.",
