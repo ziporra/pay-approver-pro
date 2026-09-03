@@ -156,6 +156,13 @@ const LOCAL_FIELD_LABELS: Record<LocalBankField, string> = {
 
 const MAX_FILE_BYTES = 15 * 1024 * 1024;
 
+/** Map a free-text country from an invoice onto the supported country list. */
+function matchCountry(value: string): string {
+  const needle = value.trim().toLowerCase();
+  if (!needle) return "";
+  return COUNTRIES.find((c) => c.toLowerCase() === needle) ?? "";
+}
+
 function RequestWizard() {
   const { t, locale } = useI18n();
   const lookup = useServerFn(lookupVendorByEmail);
