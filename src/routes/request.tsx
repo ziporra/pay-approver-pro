@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useRef, useState } from "react";
-import { AlertTriangle, CheckCircle2, FileUp, Loader2, Search, ShieldCheck } from "lucide-react";
+import { AlertTriangle, CheckCircle2, FileUp, Loader2, Search, ShieldCheck, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 import { Brand } from "@/components/Brand";
