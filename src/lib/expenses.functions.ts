@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { CURRENCIES } from "./reference";
 import { EXPENSE_TYPES, isSensitiveExpense, monthKey, templateDueDate } from "./expenses";
 
 const monthString = z
