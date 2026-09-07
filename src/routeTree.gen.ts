@@ -22,6 +22,7 @@ import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedRecurringRouteImport } from './routes/_authenticated/recurring'
 import { Route as AuthenticatedVendorsRouteImport } from './routes/_authenticated/vendors'
 import { Route as AuthenticatedPaymentsIdRouteImport } from './routes/_authenticated/payments.$id'
+import { Route as AuthenticatedVendorsIdRouteImport } from './routes/_authenticated/vendors.$id'
 import { Route as ApiPublicBootstrapStaffRouteImport } from './routes/api/public/bootstrap-staff'
 import { Route as ApiPublicMondayContactsWebhookRouteImport } from './routes/api/public/monday-contacts-webhook'
 import { Route as ApiPublicMondayRetryRouteImport } from './routes/api/public/monday-retry'
@@ -91,6 +92,11 @@ const AuthenticatedPaymentsIdRoute = AuthenticatedPaymentsIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => AuthenticatedPaymentsRoute,
 } as any)
+const AuthenticatedVendorsIdRoute = AuthenticatedVendorsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AuthenticatedVendorsRoute,
+} as any)
 const ApiPublicBootstrapStaffRoute = ApiPublicBootstrapStaffRouteImport.update({
   id: '/api/public/bootstrap-staff',
   path: '/api/public/bootstrap-staff',
@@ -125,8 +131,9 @@ export interface FileRoutesByFullPath {
   '/payments': typeof AuthenticatedPaymentsRouteWithChildren
   '/profile': typeof AuthenticatedProfileRoute
   '/recurring': typeof AuthenticatedRecurringRoute
-  '/vendors': typeof AuthenticatedVendorsRoute
+  '/vendors': typeof AuthenticatedVendorsRouteWithChildren
   '/payments/$id': typeof AuthenticatedPaymentsIdRoute
+  '/vendors/$id': typeof AuthenticatedVendorsIdRoute
   '/api/public/bootstrap-staff': typeof ApiPublicBootstrapStaffRoute
   '/api/public/monday-contacts-webhook': typeof ApiPublicMondayContactsWebhookRoute
   '/api/public/monday-retry': typeof ApiPublicMondayRetryRoute
@@ -143,8 +150,9 @@ export interface FileRoutesByTo {
   '/payments': typeof AuthenticatedPaymentsRouteWithChildren
   '/profile': typeof AuthenticatedProfileRoute
   '/recurring': typeof AuthenticatedRecurringRoute
-  '/vendors': typeof AuthenticatedVendorsRoute
+  '/vendors': typeof AuthenticatedVendorsRouteWithChildren
   '/payments/$id': typeof AuthenticatedPaymentsIdRoute
+  '/vendors/$id': typeof AuthenticatedVendorsIdRoute
   '/api/public/bootstrap-staff': typeof ApiPublicBootstrapStaffRoute
   '/api/public/monday-contacts-webhook': typeof ApiPublicMondayContactsWebhookRoute
   '/api/public/monday-retry': typeof ApiPublicMondayRetryRoute
@@ -163,8 +171,9 @@ export interface FileRoutesById {
   '/_authenticated/payments': typeof AuthenticatedPaymentsRouteWithChildren
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/recurring': typeof AuthenticatedRecurringRoute
-  '/_authenticated/vendors': typeof AuthenticatedVendorsRoute
+  '/_authenticated/vendors': typeof AuthenticatedVendorsRouteWithChildren
   '/_authenticated/payments/$id': typeof AuthenticatedPaymentsIdRoute
+  '/_authenticated/vendors/$id': typeof AuthenticatedVendorsIdRoute
   '/api/public/bootstrap-staff': typeof ApiPublicBootstrapStaffRoute
   '/api/public/monday-contacts-webhook': typeof ApiPublicMondayContactsWebhookRoute
   '/api/public/monday-retry': typeof ApiPublicMondayRetryRoute
@@ -185,6 +194,7 @@ export interface FileRouteTypes {
     | '/recurring'
     | '/vendors'
     | '/payments/$id'
+    | '/vendors/$id'
     | '/api/public/bootstrap-staff'
     | '/api/public/monday-contacts-webhook'
     | '/api/public/monday-retry'
@@ -203,6 +213,7 @@ export interface FileRouteTypes {
     | '/recurring'
     | '/vendors'
     | '/payments/$id'
+    | '/vendors/$id'
     | '/api/public/bootstrap-staff'
     | '/api/public/monday-contacts-webhook'
     | '/api/public/monday-retry'
@@ -222,6 +233,7 @@ export interface FileRouteTypes {
     | '/_authenticated/recurring'
     | '/_authenticated/vendors'
     | '/_authenticated/payments/$id'
+    | '/_authenticated/vendors/$id'
     | '/api/public/bootstrap-staff'
     | '/api/public/monday-contacts-webhook'
     | '/api/public/monday-retry'
@@ -332,6 +344,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPaymentsIdRouteImport
       parentRoute: typeof AuthenticatedPaymentsRoute
     }
+    '/_authenticated/vendors/$id': {
+      id: '/_authenticated/vendors/$id'
+      path: '/$id'
+      fullPath: '/vendors/$id'
+      preLoaderRoute: typeof AuthenticatedVendorsIdRouteImport
+      parentRoute: typeof AuthenticatedVendorsRoute
+    }
     '/api/public/bootstrap-staff': {
       id: '/api/public/bootstrap-staff'
       path: '/api/public/bootstrap-staff'
@@ -376,6 +395,17 @@ const AuthenticatedPaymentsRouteWithChildren =
     AuthenticatedPaymentsRouteChildren,
   )
 
+interface AuthenticatedVendorsRouteChildren {
+  AuthenticatedVendorsIdRoute: typeof AuthenticatedVendorsIdRoute
+}
+
+const AuthenticatedVendorsRouteChildren: AuthenticatedVendorsRouteChildren = {
+  AuthenticatedVendorsIdRoute: AuthenticatedVendorsIdRoute,
+}
+
+const AuthenticatedVendorsRouteWithChildren =
+  AuthenticatedVendorsRoute._addFileChildren(AuthenticatedVendorsRouteChildren)
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAuditRoute: typeof AuthenticatedAuditRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
@@ -384,7 +414,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPaymentsRoute: typeof AuthenticatedPaymentsRouteWithChildren
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedRecurringRoute: typeof AuthenticatedRecurringRoute
-  AuthenticatedVendorsRoute: typeof AuthenticatedVendorsRoute
+  AuthenticatedVendorsRoute: typeof AuthenticatedVendorsRouteWithChildren
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -395,7 +425,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPaymentsRoute: AuthenticatedPaymentsRouteWithChildren,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedRecurringRoute: AuthenticatedRecurringRoute,
-  AuthenticatedVendorsRoute: AuthenticatedVendorsRoute,
+  AuthenticatedVendorsRoute: AuthenticatedVendorsRouteWithChildren,
 }
 
 const AuthenticatedRouteRouteWithChildren =
