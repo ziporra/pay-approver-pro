@@ -303,6 +303,54 @@ export type Database = {
           },
         ]
       }
+      monday_import_runs: {
+        Row: {
+          conflict_count: number
+          created_at: string
+          created_count: number
+          details: Json
+          error: string | null
+          error_count: number
+          id: string
+          kind: string
+          linked_count: number
+          scanned: number
+          skipped_count: number
+          started_by: string | null
+          status: string
+        }
+        Insert: {
+          conflict_count?: number
+          created_at?: string
+          created_count?: number
+          details?: Json
+          error?: string | null
+          error_count?: number
+          id?: string
+          kind: string
+          linked_count?: number
+          scanned?: number
+          skipped_count?: number
+          started_by?: string | null
+          status?: string
+        }
+        Update: {
+          conflict_count?: number
+          created_at?: string
+          created_count?: number
+          details?: Json
+          error?: string | null
+          error_count?: number
+          id?: string
+          kind?: string
+          linked_count?: number
+          scanned?: number
+          skipped_count?: number
+          started_by?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       monday_sync_logs: {
         Row: {
           action: string
@@ -1147,6 +1195,7 @@ export type Database = {
         Row: {
           address_line: string | null
           beneficiary_name: string | null
+          category: string | null
           city: string | null
           contact_first_name: string | null
           contact_last_name: string | null
@@ -1154,10 +1203,13 @@ export type Database = {
           created_at: string
           email: string | null
           id: string
+          import_source: string | null
           internal_notes: string | null
           is_favorite: boolean
+          monday_conflicts: Json
           monday_contact_id: string | null
           monday_synced_at: string | null
+          needs_review: boolean
           payment_details_changed: boolean
           payment_details_changed_at: string | null
           payout_ready: boolean
@@ -1176,6 +1228,7 @@ export type Database = {
         Insert: {
           address_line?: string | null
           beneficiary_name?: string | null
+          category?: string | null
           city?: string | null
           contact_first_name?: string | null
           contact_last_name?: string | null
@@ -1183,10 +1236,13 @@ export type Database = {
           created_at?: string
           email?: string | null
           id?: string
+          import_source?: string | null
           internal_notes?: string | null
           is_favorite?: boolean
+          monday_conflicts?: Json
           monday_contact_id?: string | null
           monday_synced_at?: string | null
+          needs_review?: boolean
           payment_details_changed?: boolean
           payment_details_changed_at?: string | null
           payout_ready?: boolean
@@ -1205,6 +1261,7 @@ export type Database = {
         Update: {
           address_line?: string | null
           beneficiary_name?: string | null
+          category?: string | null
           city?: string | null
           contact_first_name?: string | null
           contact_last_name?: string | null
@@ -1212,10 +1269,13 @@ export type Database = {
           created_at?: string
           email?: string | null
           id?: string
+          import_source?: string | null
           internal_notes?: string | null
           is_favorite?: boolean
+          monday_conflicts?: Json
           monday_contact_id?: string | null
           monday_synced_at?: string | null
+          needs_review?: boolean
           payment_details_changed?: boolean
           payment_details_changed_at?: string | null
           payout_ready?: boolean

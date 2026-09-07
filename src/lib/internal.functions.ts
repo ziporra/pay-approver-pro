@@ -46,7 +46,7 @@ export const listVendors = createServerFn({ method: "GET" })
     const { data, error } = await context.supabase
       .from("vendors")
       .select(
-        "id, vendor_name, beneficiary_name, email, city, country, preferred_currency, preferred_payment_method, payment_details_changed, is_favorite, created_at",
+        "id, vendor_name, beneficiary_name, email, city, country, category, needs_review, monday_contact_id, monday_synced_at, preferred_currency, preferred_payment_method, payment_details_changed, is_favorite, created_at",
       )
       .order("vendor_name")
       .limit(500);

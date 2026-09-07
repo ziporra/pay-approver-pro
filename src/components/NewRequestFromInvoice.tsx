@@ -23,6 +23,7 @@ import type { ExtractedInvoice } from "@/lib/invoice-ai.server";
 import { matchVendorsFromInvoice, type VendorMatch } from "@/lib/internal.functions";
 import { isValidEmail, SORTED_CURRENCIES } from "@/lib/reference";
 import { submitPaymentRequest } from "@/lib/vendor-portal.functions";
+import { checkDuplicateInvoice, saveVendorDetailsOnly } from "@/lib/vendor-profile.functions";
 import { missingVendorFields, VENDOR_FIELD_LABEL_KEYS } from "@/lib/vendor-completeness";
 
 type Draft = {
@@ -65,11 +66,19 @@ const emptyDraft: Draft = {
   account_number: "",
 };
 
-export function NewRequestFromInvoice({ onCreated }: { onCreated: () => void }) {
+export function NewRequestFromInvoice({
+  onCreated,
+  prominent = false,
+}: {
+  onCreated: () => void;
+  prominent?: boolean;
+}) {
   const { t } = useI18n();
   const extract = useServerFn(extractInvoiceStaff);
   const matchVendors = useServerFn(matchVendorsFromInvoice);
   const submit = useServerFn(submitPaymentRequest);
+  const saveDetails = useServerFn(saveVendorDetailsOnly);
+  const checkDuplicate = useServerFn(checkDuplicateInvoice);
 
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<0 | 1 | 2>(0);
@@ -81,6 +90,7 @@ export function NewRequestFromInvoice({ onCreated }: { onCreated: () => void }) 
   const [verified, setVerified] = useState(false);
   const [busy, setBusy] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [duplicateAck, setDuplicateAck] = useState(false);
 
   const missing = missingVendorFields(draft);
   const vendorComplete = missing.length === 0;
@@ -98,6 +108,7 @@ export function NewRequestFromInvoice({ onCreated }: { onCreated: () => void }) 
     setBankFromAi(false);
     setVerified(false);
     setErrors({});
+    setDuplicateAck(false);
   }
 
   function missingLabel(fields: string[]) {
@@ -190,6 +201,35 @@ export function NewRequestFromInvoice({ onCreated }: { onCreated: () => void }) 
     setStep(2);
   }
 
+  /** Save the supplier card only — never touches banking data or payments. */
+  async function handleDetailsOnly() {
+    if (!draft.vendor_name.trim()) {
+      setErrors({ vendor: t("common.required") });
+      return;
+    }
+    setBusy(true);
+    try {
+      const res = await saveVendorDetailsOnly({
+        data: {
+          vendorId,
+          vendor_name: draft.vendor_name.trim(),
+          beneficiary_name: draft.beneficiary_name || null,
+          email: draft.email || null,
+          country: draft.country || null,
+          tax_id: draft.tax_id || null,
+        },
+      });
+      toast.success(t("vp.saveDetails") + (res.filled.length ? "" : ""));
+      setOpen(false);
+      reset();
+      onCreated();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : t("common.error"));
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function handleSubmit() {
     const next: Record<string, string> = {};
     if (!vendorComplete) next["vendor"] = t("vp.blocked");
@@ -200,6 +240,25 @@ export function NewRequestFromInvoice({ onCreated }: { onCreated: () => void }) 
     if (bankFromAi && !verified) next["verified"] = t("ai.bankWarning");
     setErrors(next);
     if (Object.keys(next).length > 0) return;
+
+    if (vendorId && draft.invoice_number.trim() && !duplicateAck) {
+      try {
+        const dup = await checkDuplicate({
+          data: { vendorId, invoiceNumber: draft.invoice_number.trim() },
+        });
+        if (dup.duplicates.length > 0) {
+          setDuplicateAck(true);
+          setErrors({
+            invoice: t("vp.duplicateInvoice", {
+              list: dup.duplicates.map((m) => m.request_number).join(", "),
+            }),
+          });
+          return;
+        }
+      } catch {
+        /* duplicate detection is advisory only */
+      }
+    }
 
     setBusy(true);
     try {
@@ -254,9 +313,13 @@ export function NewRequestFromInvoice({ onCreated }: { onCreated: () => void }) 
       }}
     >
       <DialogTrigger asChild>
-        <Button variant="outline" className="gap-2">
-          <Sparkles className="size-4" />
-          {t("ai.staffTitle")}
+        <Button
+          variant={prominent ? "default" : "outline"}
+          size={prominent ? "lg" : "default"}
+          className="gap-2"
+        >
+          <Sparkles className={prominent ? "size-5" : "size-4"} />
+          {prominent ? t("ai.uploadCta") : t("ai.staffTitle")}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-2xl">
@@ -501,6 +564,7 @@ export function NewRequestFromInvoice({ onCreated }: { onCreated: () => void }) 
               label={t("request.invoiceNumber")}
               value={draft.invoice_number}
               onChange={(v) => set("invoice_number", v)}
+              error={errors["invoice"]}
             />
             <TextField
               id="ai-due"
@@ -528,6 +592,11 @@ export function NewRequestFromInvoice({ onCreated }: { onCreated: () => void }) 
               {t("common.cancel")}
             </Button>
           )}
+          {step === 1 ? (
+            <Button variant="secondary" disabled={busy} onClick={handleDetailsOnly}>
+              {t("vp.detailsOnly")}
+            </Button>
+          ) : null}
           {step === 1 ? (
             <Button onClick={goToRequest} disabled={!vendorComplete}>
               {t("vp.continue")}

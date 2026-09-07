@@ -121,7 +121,7 @@ function mask(value: string | null | undefined): string {
   return `****${clean.slice(-4)}`;
 }
 
-async function gql<T>(query: string, variables?: Record<string, unknown>): Promise<T> {
+export async function gql<T>(query: string, variables?: Record<string, unknown>): Promise<T> {
   const token = process.env["MONDAY_API_TOKEN"];
   if (!token) throw new Error("MONDAY_API_TOKEN is not configured.");
   const res = await fetch(API_URL, {
