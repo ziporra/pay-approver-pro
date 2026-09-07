@@ -93,16 +93,16 @@ const matchSchema = z.object({
 export type VendorMatch = {
   id: string;
   vendorName: string;
-  beneficiaryName: string;
-  email: string;
+  beneficiaryName: string | null;
+  email: string | null;
   country: string | null;
   taxId: string | null;
   matchType: "exact" | "similar";
   missing: string[];
   profile: {
     vendor_name: string;
-    beneficiary_name: string;
-    email: string;
+    beneficiary_name: string | null;
+    email: string | null;
     country: string | null;
     method: "paypal" | "bank_transfer" | null;
     paypal_email: string | null;
@@ -365,4 +365,109 @@ export const getPaymentRequestDetail = createServerFn({ method: "POST" })
       .order("created_at", { ascending: false });
 
     return { request, documents: documents ?? [] };
+  });
+
+const vendorSaveSchema = z.object({
+  id: z.string().uuid().optional().nullable(),
+  vendor_name: z.string().min(2).max(200),
+  beneficiary_name: z.string().max(200).optional().nullable(),
+  email: z.string().max(200).optional().nullable(),
+  phone: z.string().max(60).optional().nullable(),
+  country: z.string().max(120).optional().nullable(),
+  city: z.string().max(120).optional().nullable(),
+  tax_id: z.string().max(80).optional().nullable(),
+  registration_number: z.string().max(80).optional().nullable(),
+  preferred_currency: z.string().max(8).optional().nullable(),
+  method: z.enum(["paypal", "bank_transfer"]).optional().nullable(),
+  paypal_email: z.string().max(200).optional().nullable(),
+  bank_name: z.string().max(160).optional().nullable(),
+  bank_country: z.string().max(120).optional().nullable(),
+  swift_bic: z.string().max(20).optional().nullable(),
+  iban: z.string().max(40).optional().nullable(),
+  account_number: z.string().max(40).optional().nullable(),
+  branch_number: z.string().max(20).optional().nullable(),
+});
+
+const emptyToNull = (value: string | null | undefined) => (value && value.trim() ? value.trim() : null);
+
+/**
+ * Save a supplier with whatever is known so far. Only the name is required;
+ * missing payout details are reported back so the UI can flag them, but they
+ * never block storing the profile.
+ */
+export const saveVendorProfile = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => vendorSaveSchema.parse(data))
+  .handler(async ({ data, context }) => {
+    const { requireRoles } = await import("./access.server");
+    await requireRoles(context.supabase, context.userId, [
+      "admin",
+      "approver",
+      "payment_manager",
+      "accounting",
+    ]);
+    const { missingPayoutFields } = await import("./vendor-completeness");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const missing = missingPayoutFields(data);
+    const vendorFields = {
+      vendor_name: data.vendor_name.trim(),
+      beneficiary_name: emptyToNull(data.beneficiary_name),
+      email: emptyToNull(data.email)?.toLowerCase() ?? null,
+      phone: emptyToNull(data.phone),
+      country: emptyToNull(data.country),
+      city: emptyToNull(data.city),
+      tax_id: emptyToNull(data.tax_id),
+      registration_number: emptyToNull(data.registration_number),
+      preferred_currency: emptyToNull(data.preferred_currency),
+      preferred_payment_method: data.method ?? null,
+      payout_ready: missing.length === 0,
+    };
+
+    let vendorId = data.id ?? null;
+    if (vendorId) {
+      const { error } = await supabaseAdmin.from("vendors").update(vendorFields).eq("id", vendorId);
+      if (error) throw new Error(error.message);
+    } else {
+      const { data: created, error } = await supabaseAdmin
+        .from("vendors")
+        .insert(vendorFields)
+        .select("id")
+        .single();
+      if (error || !created) throw new Error(error?.message ?? "Could not save the vendor.");
+      vendorId = created.id;
+    }
+
+    // Payment details are optional at this stage; store them only when given.
+    const hasPaymentData =
+      !!data.method &&
+      (data.paypal_email || data.bank_name || data.iban || data.account_number || data.swift_bic);
+    if (hasPaymentData) {
+      await supabaseAdmin
+        .from("vendor_bank_accounts")
+        .update({ is_active: false })
+        .eq("vendor_id", vendorId)
+        .eq("is_active", true);
+      await supabaseAdmin.from("vendor_bank_accounts").insert({
+        vendor_id: vendorId,
+        method: data.method!,
+        paypal_email: emptyToNull(data.paypal_email),
+        beneficiary_name: emptyToNull(data.beneficiary_name),
+        bank_name: emptyToNull(data.bank_name),
+        bank_country: emptyToNull(data.bank_country),
+        swift_bic: emptyToNull(data.swift_bic),
+        iban: emptyToNull(data.iban),
+        account_number: emptyToNull(data.account_number),
+        branch_number: emptyToNull(data.branch_number),
+        is_active: true,
+      });
+    }
+
+    await context.supabase.rpc("write_audit", {
+      _action: data.id ? "vendor_updated" : "vendor_created",
+      _vendor_id: vendorId,
+      _metadata: { missing_payout_fields: missing },
+    });
+
+    return { id: vendorId, missing, payoutReady: missing.length === 0 };
   });

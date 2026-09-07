@@ -479,8 +479,22 @@ export async function dispatchMondaySync(
 ): Promise<void> {
   const paymentRequestId = input.paymentRequestId ?? null;
   const vendorId = input.vendorId ?? null;
+
+  // Payroll-sensitive records (salary, pension, tax/deduction, any employee
+  // expense) never leave the system through the ordinary Monday boards.
+  if (paymentRequestId) {
+    const { data: row } = await admin
+      .from("payment_requests")
+      .select("is_sensitive")
+      .eq("id", paymentRequestId)
+      .maybeSingle();
+    if (row?.is_sensitive) return;
+  }
+
   const entityType = input.action === "sync_vendor" ? "vendor" : "payment_request";
   const boardId = entityType === "vendor" ? MONDAY.contactsBoard : MONDAY.paymentsBoard;
+
+
 
   const { data: log } = await admin
     .from("monday_sync_logs")

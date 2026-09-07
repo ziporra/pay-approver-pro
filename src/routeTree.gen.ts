@@ -15,8 +15,11 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as RequestRouteImport } from './routes/request'
 import { Route as AuthenticatedAuditRouteImport } from './routes/_authenticated/audit'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedEmployeesRouteImport } from './routes/_authenticated/employees'
+import { Route as AuthenticatedOverviewRouteImport } from './routes/_authenticated/overview'
 import { Route as AuthenticatedPaymentsRouteImport } from './routes/_authenticated/payments'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedRecurringRouteImport } from './routes/_authenticated/recurring'
 import { Route as AuthenticatedVendorsRouteImport } from './routes/_authenticated/vendors'
 import { Route as AuthenticatedPaymentsIdRouteImport } from './routes/_authenticated/payments.$id'
 import { Route as ApiPublicBootstrapStaffRouteImport } from './routes/api/public/bootstrap-staff'
@@ -51,6 +54,16 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedEmployeesRoute = AuthenticatedEmployeesRouteImport.update({
+  id: '/employees',
+  path: '/employees',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedOverviewRoute = AuthenticatedOverviewRouteImport.update({
+  id: '/overview',
+  path: '/overview',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedPaymentsRoute = AuthenticatedPaymentsRouteImport.update({
   id: '/payments',
   path: '/payments',
@@ -59,6 +72,11 @@ const AuthenticatedPaymentsRoute = AuthenticatedPaymentsRouteImport.update({
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedRecurringRoute = AuthenticatedRecurringRouteImport.update({
+  id: '/recurring',
+  path: '/recurring',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedVendorsRoute = AuthenticatedVendorsRouteImport.update({
@@ -88,8 +106,11 @@ export interface FileRoutesByFullPath {
   '/request': typeof RequestRoute
   '/audit': typeof AuthenticatedAuditRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/employees': typeof AuthenticatedEmployeesRoute
+  '/overview': typeof AuthenticatedOverviewRoute
   '/payments': typeof AuthenticatedPaymentsRouteWithChildren
   '/profile': typeof AuthenticatedProfileRoute
+  '/recurring': typeof AuthenticatedRecurringRoute
   '/vendors': typeof AuthenticatedVendorsRoute
   '/payments/$id': typeof AuthenticatedPaymentsIdRoute
   '/api/public/bootstrap-staff': typeof ApiPublicBootstrapStaffRoute
@@ -101,8 +122,11 @@ export interface FileRoutesByTo {
   '/request': typeof RequestRoute
   '/audit': typeof AuthenticatedAuditRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/employees': typeof AuthenticatedEmployeesRoute
+  '/overview': typeof AuthenticatedOverviewRoute
   '/payments': typeof AuthenticatedPaymentsRouteWithChildren
   '/profile': typeof AuthenticatedProfileRoute
+  '/recurring': typeof AuthenticatedRecurringRoute
   '/vendors': typeof AuthenticatedVendorsRoute
   '/payments/$id': typeof AuthenticatedPaymentsIdRoute
   '/api/public/bootstrap-staff': typeof ApiPublicBootstrapStaffRoute
@@ -116,8 +140,11 @@ export interface FileRoutesById {
   '/request': typeof RequestRoute
   '/_authenticated/audit': typeof AuthenticatedAuditRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/employees': typeof AuthenticatedEmployeesRoute
+  '/_authenticated/overview': typeof AuthenticatedOverviewRoute
   '/_authenticated/payments': typeof AuthenticatedPaymentsRouteWithChildren
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/recurring': typeof AuthenticatedRecurringRoute
   '/_authenticated/vendors': typeof AuthenticatedVendorsRoute
   '/_authenticated/payments/$id': typeof AuthenticatedPaymentsIdRoute
   '/api/public/bootstrap-staff': typeof ApiPublicBootstrapStaffRoute
@@ -131,8 +158,11 @@ export interface FileRouteTypes {
     | '/request'
     | '/audit'
     | '/dashboard'
+    | '/employees'
+    | '/overview'
     | '/payments'
     | '/profile'
+    | '/recurring'
     | '/vendors'
     | '/payments/$id'
     | '/api/public/bootstrap-staff'
@@ -144,8 +174,11 @@ export interface FileRouteTypes {
     | '/request'
     | '/audit'
     | '/dashboard'
+    | '/employees'
+    | '/overview'
     | '/payments'
     | '/profile'
+    | '/recurring'
     | '/vendors'
     | '/payments/$id'
     | '/api/public/bootstrap-staff'
@@ -158,8 +191,11 @@ export interface FileRouteTypes {
     | '/request'
     | '/_authenticated/audit'
     | '/_authenticated/dashboard'
+    | '/_authenticated/employees'
+    | '/_authenticated/overview'
     | '/_authenticated/payments'
     | '/_authenticated/profile'
+    | '/_authenticated/recurring'
     | '/_authenticated/vendors'
     | '/_authenticated/payments/$id'
     | '/api/public/bootstrap-staff'
@@ -219,6 +255,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/employees': {
+      id: '/_authenticated/employees'
+      path: '/employees'
+      fullPath: '/employees'
+      preLoaderRoute: typeof AuthenticatedEmployeesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/overview': {
+      id: '/_authenticated/overview'
+      path: '/overview'
+      fullPath: '/overview'
+      preLoaderRoute: typeof AuthenticatedOverviewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/payments': {
       id: '/_authenticated/payments'
       path: '/payments'
@@ -231,6 +281,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/recurring': {
+      id: '/_authenticated/recurring'
+      path: '/recurring'
+      fullPath: '/recurring'
+      preLoaderRoute: typeof AuthenticatedRecurringRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/vendors': {
@@ -280,16 +337,22 @@ const AuthenticatedPaymentsRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAuditRoute: typeof AuthenticatedAuditRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedEmployeesRoute: typeof AuthenticatedEmployeesRoute
+  AuthenticatedOverviewRoute: typeof AuthenticatedOverviewRoute
   AuthenticatedPaymentsRoute: typeof AuthenticatedPaymentsRouteWithChildren
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedRecurringRoute: typeof AuthenticatedRecurringRoute
   AuthenticatedVendorsRoute: typeof AuthenticatedVendorsRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAuditRoute: AuthenticatedAuditRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedEmployeesRoute: AuthenticatedEmployeesRoute,
+  AuthenticatedOverviewRoute: AuthenticatedOverviewRoute,
   AuthenticatedPaymentsRoute: AuthenticatedPaymentsRouteWithChildren,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedRecurringRoute: AuthenticatedRecurringRoute,
   AuthenticatedVendorsRoute: AuthenticatedVendorsRoute,
 }
 
