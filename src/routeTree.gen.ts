@@ -25,6 +25,7 @@ import { Route as AuthenticatedPaymentsIdRouteImport } from './routes/_authentic
 import { Route as ApiPublicBootstrapStaffRouteImport } from './routes/api/public/bootstrap-staff'
 import { Route as ApiPublicMondayContactsWebhookRouteImport } from './routes/api/public/monday-contacts-webhook'
 import { Route as ApiPublicMondayRetryRouteImport } from './routes/api/public/monday-retry'
+import { Route as ApiPublicMondayVendorImportRouteImport } from './routes/api/public/monday-vendor-import'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -106,6 +107,12 @@ const ApiPublicMondayRetryRoute = ApiPublicMondayRetryRouteImport.update({
   path: '/api/public/monday-retry',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicMondayVendorImportRoute =
+  ApiPublicMondayVendorImportRouteImport.update({
+    id: '/api/public/monday-vendor-import',
+    path: '/api/public/monday-vendor-import',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -123,6 +130,7 @@ export interface FileRoutesByFullPath {
   '/api/public/bootstrap-staff': typeof ApiPublicBootstrapStaffRoute
   '/api/public/monday-contacts-webhook': typeof ApiPublicMondayContactsWebhookRoute
   '/api/public/monday-retry': typeof ApiPublicMondayRetryRoute
+  '/api/public/monday-vendor-import': typeof ApiPublicMondayVendorImportRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -140,6 +148,7 @@ export interface FileRoutesByTo {
   '/api/public/bootstrap-staff': typeof ApiPublicBootstrapStaffRoute
   '/api/public/monday-contacts-webhook': typeof ApiPublicMondayContactsWebhookRoute
   '/api/public/monday-retry': typeof ApiPublicMondayRetryRoute
+  '/api/public/monday-vendor-import': typeof ApiPublicMondayVendorImportRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -159,6 +168,7 @@ export interface FileRoutesById {
   '/api/public/bootstrap-staff': typeof ApiPublicBootstrapStaffRoute
   '/api/public/monday-contacts-webhook': typeof ApiPublicMondayContactsWebhookRoute
   '/api/public/monday-retry': typeof ApiPublicMondayRetryRoute
+  '/api/public/monday-vendor-import': typeof ApiPublicMondayVendorImportRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -178,6 +188,7 @@ export interface FileRouteTypes {
     | '/api/public/bootstrap-staff'
     | '/api/public/monday-contacts-webhook'
     | '/api/public/monday-retry'
+    | '/api/public/monday-vendor-import'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -195,6 +206,7 @@ export interface FileRouteTypes {
     | '/api/public/bootstrap-staff'
     | '/api/public/monday-contacts-webhook'
     | '/api/public/monday-retry'
+    | '/api/public/monday-vendor-import'
   id:
     | '__root__'
     | '/'
@@ -213,6 +225,7 @@ export interface FileRouteTypes {
     | '/api/public/bootstrap-staff'
     | '/api/public/monday-contacts-webhook'
     | '/api/public/monday-retry'
+    | '/api/public/monday-vendor-import'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -223,6 +236,7 @@ export interface RootRouteChildren {
   ApiPublicBootstrapStaffRoute: typeof ApiPublicBootstrapStaffRoute
   ApiPublicMondayContactsWebhookRoute: typeof ApiPublicMondayContactsWebhookRoute
   ApiPublicMondayRetryRoute: typeof ApiPublicMondayRetryRoute
+  ApiPublicMondayVendorImportRoute: typeof ApiPublicMondayVendorImportRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -339,6 +353,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicMondayRetryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/monday-vendor-import': {
+      id: '/api/public/monday-vendor-import'
+      path: '/api/public/monday-vendor-import'
+      fullPath: '/api/public/monday-vendor-import'
+      preLoaderRoute: typeof ApiPublicMondayVendorImportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -388,6 +409,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicBootstrapStaffRoute: ApiPublicBootstrapStaffRoute,
   ApiPublicMondayContactsWebhookRoute: ApiPublicMondayContactsWebhookRoute,
   ApiPublicMondayRetryRoute: ApiPublicMondayRetryRoute,
+  ApiPublicMondayVendorImportRoute: ApiPublicMondayVendorImportRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
