@@ -108,6 +108,7 @@ export type MappedContact = {
   mondayItemId: string;
   appVendorId: string | null;
   unnamed: boolean;
+  sparse: boolean;
   vendor: {
     vendor_name: string;
     beneficiary_name: string | null;
@@ -146,6 +147,8 @@ export function mapContact(item: RawItem): MappedContact {
       return raw && UUID.test(raw) ? raw.toLowerCase() : null;
     })(),
     unnamed,
+    // No e-mail, phone or address at all: usable, but a human should look at it.
+    sparse: !text(item, c.email) && !text(item, c.phone) && !text(item, c.address),
     vendor: {
       vendor_name: unnamed ? `Unnamed contact #${item.id}` : company,
       beneficiary_name: text(item, c.beneficiaryName),
@@ -246,7 +249,7 @@ async function applyOne(
   const incoming = mapped.vendor as unknown as Record<string, string | null>;
 
   if (!existing) {
-    if (dryRun) return { ...base, result: "created", needsReview: mapped.unnamed };
+    if (dryRun) return { ...base, result: "created", needsReview: mapped.unnamed || mapped.sparse };
     const { data: created, error } = await admin
       .from("vendors")
       .insert({
@@ -254,14 +257,14 @@ async function applyOne(
         monday_contact_id: mapped.mondayItemId,
         monday_synced_at: new Date().toISOString(),
         import_source: "monday_contacts",
-        needs_review: mapped.unnamed || Boolean(base.conflicts?.length),
+        needs_review: mapped.unnamed || mapped.sparse || Boolean(base.conflicts?.length),
         monday_conflicts: (base.conflicts ?? []) as unknown as never,
       })
       .select("id")
       .single();
     if (error) return { ...base, result: "error", message: error.message };
     await upsertBank(admin, created.id, mapped);
-    return { ...base, result: "created", needsReview: mapped.unnamed };
+    return { ...base, result: "created", needsReview: mapped.unnamed || mapped.sparse };
   }
 
   const { patch, conflicts } = mergeVendor(existing as Record<string, unknown>, incoming);
@@ -285,7 +288,7 @@ async function applyOne(
       monday_contact_id: mapped.mondayItemId,
       monday_synced_at: new Date().toISOString(),
       import_source: existing.import_source ?? "monday_contacts",
-      needs_review: allConflicts.length > 0 ? true : existing.needs_review,
+      needs_review: allConflicts.length > 0 || mapped.unnamed || mapped.sparse ? true : existing.needs_review,
       monday_conflicts: allConflicts as unknown as never,
     })
     .eq("id", existing.id);
