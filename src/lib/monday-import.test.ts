@@ -9,7 +9,7 @@ function item(id: string, name: string, columns: Col[] = []) {
 
 describe("monday contact mapping", () => {
   it("excludes the synthetic QA item", () => {
-    expect(EXCLUDED_MONDAY_ITEM_IDS.has("3210115337")).toBe(true);
+    expect(EXCLUDED_MONDAY_ITEM_IDS).toContain("3210115337");
   });
 
   it("flags a contact with no email, phone or address as needing review", () => {
@@ -29,7 +29,7 @@ describe("monday contact mapping", () => {
     const mapped = mapContact(
       item("2", "Acme", [{ id: MONDAY.contacts.maskedAccount, text: "****1234" }]),
     );
-    expect(mapped.bank?.account_number ?? null).toBeNull();
-    expect(mapped.bank?.iban ?? null).toBeNull();
+    expect(Object.keys(mapped.bank ?? {})).not.toContain("account_number");
+    expect(Object.keys(mapped.bank ?? {})).not.toContain("iban");
   });
 });
