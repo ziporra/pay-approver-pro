@@ -77,13 +77,23 @@ export const listMonthlyExpenses = createServerFn({ method: "POST" })
     };
   });
 
+const CURRENCY_CODES = new Set(CURRENCIES.map((c) => c.code));
+
+/** Currency must be chosen explicitly; blank or unknown codes are rejected. */
+const currencySchema = z
+  .string()
+  .trim()
+  .min(1, "Currency is required")
+  .transform((v) => v.toUpperCase())
+  .refine((v) => CURRENCY_CODES.has(v), "Unsupported currency");
+
 const expenseSchema = z.object({
   expense_type: expenseTypeEnum,
   vendor_id: z.string().uuid().optional().nullable(),
   employee_id: z.string().uuid().optional().nullable(),
   recipient_name: z.string().max(200).optional().nullable(),
   amount: z.number().positive().max(1_000_000_000),
-  currency: z.string().min(3).max(8),
+  currency: currencySchema,
   description: z.string().min(2).max(1000),
   category: z.string().max(80).optional().nullable(),
   accounting_month: monthString,
@@ -122,7 +132,7 @@ export const createExpense = createServerFn({ method: "POST" })
         recipient_name: data.recipient_name?.trim() || null,
         recipient_kind: data.employee_id ? "employee" : data.vendor_id ? "vendor" : "other",
         amount: data.amount,
-        currency: data.currency.toUpperCase(),
+        currency: data.currency,
         description: data.description,
         category: data.category ?? null,
         accounting_month: data.accounting_month,
@@ -179,7 +189,7 @@ const templateSchema = z.object({
   employee_id: z.string().uuid().optional().nullable(),
   recipient_name: z.string().max(200).optional().nullable(),
   amount: z.number().positive().max(1_000_000_000),
-  currency: z.string().min(3).max(8),
+  currency: currencySchema,
   category: z.string().max(80).optional().nullable(),
   description: z.string().min(2).max(1000),
   payment_method: z.enum(["paypal", "bank_transfer"]).default("bank_transfer"),
@@ -205,7 +215,7 @@ export const saveRecurringTemplate = createServerFn({ method: "POST" })
       employee_id: data.employee_id ?? null,
       recipient_name: data.recipient_name?.trim() || null,
       amount: data.amount,
-      currency: data.currency.toUpperCase(),
+      currency: data.currency,
       category: data.category ?? null,
       description: data.description,
       payment_method: data.payment_method,
