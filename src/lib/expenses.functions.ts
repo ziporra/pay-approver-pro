@@ -2,8 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { CURRENCIES } from "./reference";
-import { EXPENSE_TYPES, isSensitiveExpense, monthKey, templateDueDate } from "./expenses";
+import { EXPENSE_TYPES, normalizeCurrency, isSensitiveExpense, monthKey, templateDueDate } from "./expenses";
 
 const monthString = z
   .string()
@@ -78,15 +77,11 @@ export const listMonthlyExpenses = createServerFn({ method: "POST" })
     };
   });
 
-const CURRENCY_CODES = new Set(CURRENCIES.map((c) => c.code));
-
 /** Currency must be chosen explicitly; blank or unknown codes are rejected. */
 const currencySchema = z
   .string()
-  .trim()
-  .min(1, "Currency is required")
-  .transform((v) => v.toUpperCase())
-  .refine((v) => CURRENCY_CODES.has(v), "Unsupported currency");
+  .transform((v) => normalizeCurrency(v))
+  .refine((v): v is string => v !== null, "Currency is required");
 
 const expenseSchema = z.object({
   expense_type: expenseTypeEnum,
