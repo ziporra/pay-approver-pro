@@ -1,10 +1,10 @@
-import {
-  normalizeCurrency, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import {
   currentMonthKey,
   isSensitiveExpense,
   monthKey,
+  normalizeCurrency,
   recentMonths,
   templateDueDate,
   totalsByCurrency,
