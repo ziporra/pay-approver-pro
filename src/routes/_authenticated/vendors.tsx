@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { AlertTriangle, Search } from "lucide-react";
 
+import { NewVendorDialog } from "@/components/NewVendorDialog";
 import { VENDOR_FIELD_LABEL_KEYS } from "@/lib/vendor-completeness";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -59,14 +60,17 @@ function VendorsPage() {
             Contact details are masked. Banking details are never displayed in full.
           </p>
         </div>
-        <div className="relative w-full sm:w-72">
+        <div className="flex w-full items-center gap-2 sm:w-auto">
+          <div className="relative w-full sm:w-72">
           <Search className="absolute start-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             className="ps-9"
             placeholder={t("table.search")}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-          />
+            />
+          </div>
+          <NewVendorDialog />
         </div>
       </div>
 
