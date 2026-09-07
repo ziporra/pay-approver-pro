@@ -52,7 +52,7 @@ const emptyDraft: Draft = {
   country: "",
   tax_id: "",
   amount: "",
-  currency: "USD",
+  currency: "",
   description: "",
   invoice_number: "",
   due_date: "",
