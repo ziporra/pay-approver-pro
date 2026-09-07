@@ -219,7 +219,7 @@ export function NewRequestFromInvoice({
           tax_id: draft.tax_id || null,
         },
       });
-      toast.success(res.vendorName);
+      toast.success(t("vp.saveDetails") + (res.filled.length ? "" : ""));
       setOpen(false);
       reset();
       onCreated();
@@ -246,11 +246,11 @@ export function NewRequestFromInvoice({
         const dup = await checkDuplicate({
           data: { vendorId, invoiceNumber: draft.invoice_number.trim() },
         });
-        if (dup.matches.length > 0) {
+        if (dup.duplicates.length > 0) {
           setDuplicateAck(true);
           setErrors({
             invoice: t("vp.duplicateInvoice", {
-              list: dup.matches.map((m) => m.request_number).join(", "),
+              list: dup.duplicates.map((m) => m.request_number).join(", "),
             }),
           });
           return;
