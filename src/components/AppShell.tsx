@@ -43,7 +43,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </Link>
           <nav className="flex items-center gap-1">
             {nav
-              .filter((item) => !item.admin || isAdmin)
+              .filter((item) => item.show)
               .map((item) => (
                 <Link
                   key={item.to}
