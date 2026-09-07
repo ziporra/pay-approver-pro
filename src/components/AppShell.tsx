@@ -1,5 +1,13 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, Receipt, ScrollText, Users } from "lucide-react";
+import {
+  CalendarClock,
+  CalendarRange,
+  LayoutDashboard,
+  Receipt,
+  ScrollText,
+  UserCog,
+  Users,
+} from "lucide-react";
 import type { ReactNode } from "react";
 
 import { Brand } from "@/components/Brand";
@@ -12,14 +20,19 @@ import { cn } from "@/lib/utils";
 export function AppShell({ children }: { children: ReactNode }) {
   const { t } = useI18n();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const { isAdmin } = useStaffProfile();
+  const { isAdmin, roles } = useStaffProfile();
+  const payroll = roles.some((r) => ["admin", "accounting", "payment_manager"].includes(r));
 
   const nav = [
-    { to: "/dashboard", label: t("nav.dashboard"), icon: LayoutDashboard, admin: false },
-    { to: "/payments", label: t("nav.payments"), icon: Receipt, admin: false },
-    { to: "/vendors", label: t("nav.vendors"), icon: Users, admin: false },
-    { to: "/audit", label: t("nav.audit"), icon: ScrollText, admin: true },
+    { to: "/dashboard", label: t("nav.dashboard"), icon: LayoutDashboard, show: true },
+    { to: "/overview", label: t("nav.overview"), icon: CalendarRange, show: true },
+    { to: "/payments", label: t("nav.payments"), icon: Receipt, show: true },
+    { to: "/vendors", label: t("nav.vendors"), icon: Users, show: true },
+    { to: "/employees", label: t("nav.employees"), icon: UserCog, show: payroll },
+    { to: "/recurring", label: t("nav.recurring"), icon: CalendarClock, show: payroll },
+    { to: "/audit", label: t("nav.audit"), icon: ScrollText, show: isAdmin },
   ] as const;
+
 
   return (
     <div className="min-h-screen bg-surface">
