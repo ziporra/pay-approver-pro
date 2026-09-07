@@ -129,7 +129,7 @@ export function NewVendorDialog() {
 
           {paypal ? (
             <div className="sm:col-span-2">
-              <Label htmlFor="v-pp">{t("method.paypalEmail")}</Label>
+              <Label htmlFor="v-pp">{t("paypal.email")}</Label>
               <Input id="v-pp" value={form.paypal_email} onChange={set("paypal_email")} className="mt-1" />
               <p className="mt-1 text-xs text-muted-foreground">{t("exp.noBankForPaypal")}</p>
             </div>
@@ -142,7 +142,7 @@ export function NewVendorDialog() {
                 <Input id="v-bank" value={form.bank_name} onChange={set("bank_name")} className="mt-1" />
               </div>
               <div>
-                <Label htmlFor="v-bankcountry">{t("bank.country")}</Label>
+                <Label htmlFor="v-bankcountry">{t("bank.bankCountry")}</Label>
                 <Input
                   id="v-bankcountry"
                   value={form.bank_country}
@@ -169,7 +169,9 @@ export function NewVendorDialog() {
         {missing.length > 0 ? (
           <p className="text-sm text-destructive">
             {t("exp.payoutMissing")}:{" "}
-            {missing.map((f) => t(VENDOR_FIELD_LABEL_KEYS[f] ?? "exp.paymentDetails")).join(", ")}
+            {missing
+              .map((f) => t((VENDOR_FIELD_LABEL_KEYS[f] ?? "exp.paymentDetails") as "vendor.name"))
+              .join(", ")}
           </p>
         ) : (
           <p className="text-sm text-success-foreground">{t("exp.payoutReady")}</p>
