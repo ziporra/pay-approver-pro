@@ -188,6 +188,7 @@ function PaymentsPage() {
             </SelectContent>
           </Select>
           <NewRequestFromInvoice
+            prominent
             onCreated={() => queryClient.invalidateQueries({ queryKey: ["payment-requests"] })}
           />
           <Button variant="outline" onClick={exportCsv} className="gap-2">
