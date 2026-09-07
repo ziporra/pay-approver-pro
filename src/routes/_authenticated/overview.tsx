@@ -284,7 +284,7 @@ function NewExpenseDialog({ payroll, month }: { payroll: boolean; month: string 
   const [employeeId, setEmployeeId] = useState("");
   const [recipientName, setRecipientName] = useState("");
   const [amount, setAmount] = useState("");
-  const [currency, setCurrency] = useState("USD");
+  const [currency, setCurrency] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [accountingMonth, setAccountingMonth] = useState(month);
@@ -327,7 +327,11 @@ function NewExpenseDialog({ payroll, month }: { payroll: boolean; month: string 
   });
 
   const months = useMemo(() => recentMonths(15), []);
-  const valid = Number(amount) > 0 && description.trim().length > 1 && (vendorId || employeeId || recipientName.trim());
+  const valid =
+    Number(amount) > 0 &&
+    currency !== "" &&
+    description.trim().length > 1 &&
+    (vendorId || employeeId || recipientName.trim());
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -428,6 +432,7 @@ function NewExpenseDialog({ payroll, month }: { payroll: boolean; month: string 
               onChange={(e) => setCurrency(e.target.value)}
               className="mt-1 h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
             >
+              <option value="">{t("exp.selectCurrency")}</option>
               {SORTED_CURRENCIES.map((c) => (
                 <option key={c.code} value={c.code}>
                   {c.code} — {c.name}

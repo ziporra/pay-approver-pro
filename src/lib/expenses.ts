@@ -100,3 +100,14 @@ export const STATUS_TONE: Record<string, "neutral" | "pending" | "positive" | "n
   rejected: "negative",
   cancelled: "neutral",
 };
+
+import { CURRENCIES } from "./reference";
+
+const CURRENCY_CODE_SET = new Set(CURRENCIES.map((c) => c.code));
+
+/** Currency must be picked explicitly: blank, unknown or malformed codes are rejected. */
+export function normalizeCurrency(value: string | null | undefined): string | null {
+  const code = (value ?? "").trim().toUpperCase();
+  if (code.length !== 3) return null;
+  return CURRENCY_CODE_SET.has(code) ? code : null;
+}

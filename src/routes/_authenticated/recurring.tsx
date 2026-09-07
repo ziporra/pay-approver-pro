@@ -117,7 +117,7 @@ function RecurringPage() {
                   {(data?.rows ?? []).length === 0 ? (
                     <tr>
                       <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
-                        {t("table.empty")}
+                        {t("exp.noTemplates")}
                       </td>
                     </tr>
                   ) : (
@@ -164,7 +164,7 @@ function TemplateDialog({ payroll }: { payroll: boolean }) {
   const [employeeId, setEmployeeId] = useState("");
   const [recipientName, setRecipientName] = useState("");
   const [amount, setAmount] = useState("");
-  const [currency, setCurrency] = useState("USD");
+  const [currency, setCurrency] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [dueDay, setDueDay] = useState("1");
@@ -202,7 +202,7 @@ function TemplateDialog({ payroll }: { payroll: boolean }) {
     onError: (error: Error) => toast.error(error.message),
   });
 
-  const valid = name.trim().length > 1 && Number(amount) > 0 && description.trim().length > 1;
+  const valid = name.trim().length > 1 && Number(amount) > 0 && currency !== "" && description.trim().length > 1;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -312,6 +312,7 @@ function TemplateDialog({ payroll }: { payroll: boolean }) {
               onChange={(e) => setCurrency(e.target.value)}
               className="mt-1 h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
             >
+              <option value="">{t("exp.selectCurrency")}</option>
               {SORTED_CURRENCIES.map((c) => (
                 <option key={c.code} value={c.code}>
                   {c.code}

@@ -83,7 +83,7 @@ function EmployeesPage() {
                   {(data?.rows ?? []).length === 0 ? (
                     <tr>
                       <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
-                        {t("table.empty")}
+                        {t("exp.noEmployees")}
                       </td>
                     </tr>
                   ) : (
@@ -178,7 +178,7 @@ function NewEmployeeDialog() {
     job_title: "",
     country: "",
     start_date: "",
-    default_currency: "ILS",
+    default_currency: "",
     bank_name: "",
     iban: "",
     account_number: "",
@@ -244,6 +244,7 @@ function NewEmployeeDialog() {
               onChange={set("default_currency")}
               className="mt-1 h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
             >
+              <option value="">{t("exp.selectCurrency")}</option>
               {SORTED_CURRENCIES.map((c) => (
                 <option key={c.code} value={c.code}>
                   {c.code}

@@ -4,6 +4,7 @@ import {
   currentMonthKey,
   isSensitiveExpense,
   monthKey,
+  normalizeCurrency,
   recentMonths,
   templateDueDate,
   totalsByCurrency,
@@ -133,5 +134,18 @@ describe("payroll sensitivity", () => {
     expect(isSensitiveExpense("tax_deduction")).toBe(true);
     expect(isSensitiveExpense("supplier")).toBe(false);
     expect(isSensitiveExpense("supplier", "b0b3f2f0-0000-4000-8000-000000000000")).toBe(true);
+  });
+});
+
+describe("normalizeCurrency", () => {
+  it("rejects blank and unknown currencies", () => {
+    expect(normalizeCurrency("")).toBeNull();
+    expect(normalizeCurrency(null)).toBeNull();
+    expect(normalizeCurrency("XYZ")).toBeNull();
+    expect(normalizeCurrency("US")).toBeNull();
+  });
+  it("accepts known codes case-insensitively", () => {
+    expect(normalizeCurrency("usd")).toBe("USD");
+    expect(normalizeCurrency(" ils ")).toBe("ILS");
   });
 });

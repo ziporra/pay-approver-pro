@@ -52,7 +52,7 @@ const emptyDraft: Draft = {
   country: "",
   tax_id: "",
   amount: "",
-  currency: "USD",
+  currency: "",
   description: "",
   invoice_number: "",
   due_date: "",
@@ -194,6 +194,7 @@ export function NewRequestFromInvoice({ onCreated }: { onCreated: () => void }) 
     const next: Record<string, string> = {};
     if (!vendorComplete) next["vendor"] = t("vp.blocked");
     if (!(Number(draft.amount) > 0)) next["amount"] = t("common.required");
+    if (draft.currency.trim().length !== 3) next["currency"] = t("exp.currencyRequired");
     if (draft.description.trim().length < 3) next["description"] = t("common.required");
     if (!file) next["file"] = t("docs.help");
     if (bankFromAi && !verified) next["verified"] = t("ai.bankWarning");
@@ -482,6 +483,8 @@ export function NewRequestFromInvoice({ onCreated }: { onCreated: () => void }) 
               label={t("request.currency")}
               value={draft.currency}
               onChange={(v) => set("currency", v.toUpperCase().slice(0, 3))}
+              error={errors["currency"]}
+              placeholder={t("exp.selectCurrency")}
               required
             />
             <TextField

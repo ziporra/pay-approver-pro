@@ -179,7 +179,7 @@ function RequestWizard() {
   const [vendor, setVendor] = useState<VendorForm>(emptyVendor);
   const [payment, setPayment] = useState<PaymentForm>(emptyPayment);
   const [amount, setAmount] = useState("");
-  const [currency, setCurrency] = useState("USD");
+  const [currency, setCurrency] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [invoiceNumber, setInvoiceNumber] = useState("");
@@ -429,6 +429,7 @@ function RequestWizard() {
     if (index === 3) {
       const value = Number(amount);
       if (!Number.isFinite(value) || value <= 0) next["amount"] = t("common.required");
+      if (!currency) next["currency"] = t("exp.currencyRequired");
       if (description.trim().length < 3) next["description"] = t("common.required");
     }
     if (index === 4) {
@@ -977,10 +978,10 @@ function RequestWizard() {
                   error={errors["amount"]}
                   required
                 />
-                <Field label={t("request.currency")} htmlFor="currency" required>
+                <Field label={t("request.currency")} htmlFor="currency" required error={errors["currency"]}>
                   <Select value={currency} onValueChange={setCurrency}>
                     <SelectTrigger id="currency">
-                      <SelectValue />
+                      <SelectValue placeholder={t("exp.selectCurrency")} />
                     </SelectTrigger>
                     <SelectContent className="max-h-72">
                       {SORTED_CURRENCIES.map((c) => (
