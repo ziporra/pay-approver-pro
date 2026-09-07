@@ -161,8 +161,8 @@ export function NewRequestFromInvoice({ onCreated }: { onCreated: () => void }) 
     setDraft((prev) => ({
       ...prev,
       vendor_name: match.profile.vendor_name,
-      beneficiary_name: match.profile.beneficiary_name,
-      email: match.profile.email,
+      beneficiary_name: match.profile.beneficiary_name ?? prev.beneficiary_name,
+      email: match.profile.email ?? prev.email,
       country: match.profile.country ?? prev.country,
       tax_id: match.taxId ?? prev.tax_id,
       method: match.profile.method ?? prev.method,

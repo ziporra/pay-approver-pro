@@ -53,10 +53,10 @@ export type MaskedVendor = {
 type VendorRow = {
   id: string;
   vendor_name: string;
-  beneficiary_name: string;
+  beneficiary_name: string | null;
   contact_first_name: string | null;
   contact_last_name: string | null;
-  email: string;
+  email: string | null;
   phone: string | null;
   city: string | null;
   country: string | null;
@@ -82,7 +82,7 @@ export function toMaskedVendor(vendor: VendorRow, bank: BankRow | null): MaskedV
   return {
     id: vendor.id,
     vendorName: vendor.vendor_name,
-    beneficiaryName: vendor.beneficiary_name,
+    beneficiaryName: vendor.beneficiary_name ?? "",
     contactName: [vendor.contact_first_name, vendor.contact_last_name].filter(Boolean).join(" "),
     maskedEmail: maskEmail(vendor.email),
     maskedPhone: maskPhone(vendor.phone),

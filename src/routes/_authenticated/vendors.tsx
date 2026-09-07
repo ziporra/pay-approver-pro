@@ -45,8 +45,8 @@ function VendorsPage() {
     const q = query.toLowerCase();
     return (
       v.vendor_name.toLowerCase().includes(q) ||
-      v.beneficiary_name.toLowerCase().includes(q) ||
-      v.email.toLowerCase().includes(q)
+      (v.beneficiary_name ?? "").toLowerCase().includes(q) ||
+      (v.email ?? "").toLowerCase().includes(q)
     );
   });
 

@@ -93,16 +93,16 @@ const matchSchema = z.object({
 export type VendorMatch = {
   id: string;
   vendorName: string;
-  beneficiaryName: string;
-  email: string;
+  beneficiaryName: string | null;
+  email: string | null;
   country: string | null;
   taxId: string | null;
   matchType: "exact" | "similar";
   missing: string[];
   profile: {
     vendor_name: string;
-    beneficiary_name: string;
-    email: string;
+    beneficiary_name: string | null;
+    email: string | null;
     country: string | null;
     method: "paypal" | "bank_transfer" | null;
     paypal_email: string | null;

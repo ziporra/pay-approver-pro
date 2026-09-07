@@ -187,6 +187,84 @@ export type Database = {
           },
         ]
       }
+      employees: {
+        Row: {
+          account_number: string | null
+          bank_country: string | null
+          bank_name: string | null
+          branch_number: string | null
+          country: string | null
+          created_at: string
+          created_by: string | null
+          default_currency: string | null
+          department: string | null
+          email: string | null
+          employee_number: string | null
+          end_date: string | null
+          full_name: string
+          iban: string | null
+          id: string
+          is_active: boolean
+          job_title: string | null
+          notes: string | null
+          payment_method: Database["public"]["Enums"]["payment_method"] | null
+          phone: string | null
+          start_date: string | null
+          swift_bic: string | null
+          updated_at: string
+        }
+        Insert: {
+          account_number?: string | null
+          bank_country?: string | null
+          bank_name?: string | null
+          branch_number?: string | null
+          country?: string | null
+          created_at?: string
+          created_by?: string | null
+          default_currency?: string | null
+          department?: string | null
+          email?: string | null
+          employee_number?: string | null
+          end_date?: string | null
+          full_name: string
+          iban?: string | null
+          id?: string
+          is_active?: boolean
+          job_title?: string | null
+          notes?: string | null
+          payment_method?: Database["public"]["Enums"]["payment_method"] | null
+          phone?: string | null
+          start_date?: string | null
+          swift_bic?: string | null
+          updated_at?: string
+        }
+        Update: {
+          account_number?: string | null
+          bank_country?: string | null
+          bank_name?: string | null
+          branch_number?: string | null
+          country?: string | null
+          created_at?: string
+          created_by?: string | null
+          default_currency?: string | null
+          department?: string | null
+          email?: string | null
+          employee_number?: string | null
+          end_date?: string | null
+          full_name?: string
+          iban?: string | null
+          id?: string
+          is_active?: boolean
+          job_title?: string | null
+          notes?: string | null
+          payment_method?: Database["public"]["Enums"]["payment_method"] | null
+          phone?: string | null
+          start_date?: string | null
+          swift_bic?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       invoice_reminders: {
         Row: {
           channel: string
@@ -472,6 +550,7 @@ export type Database = {
       }
       payment_requests: {
         Row: {
+          accounting_month: string | null
           amount: number
           approved_at: string | null
           approved_by: string | null
@@ -481,9 +560,12 @@ export type Database = {
           description: string
           due_date: string | null
           duplicate_of: string | null
+          employee_id: string | null
+          expense_type: Database["public"]["Enums"]["expense_type"]
           id: string
           invoice_number: string | null
           invoice_status: Database["public"]["Enums"]["invoice_status"]
+          is_sensitive: boolean
           monday_item_id: string | null
           monday_sync_status: string
           monday_synced_at: string | null
@@ -493,17 +575,21 @@ export type Database = {
           payment_snapshot: Json
           po_reference: string | null
           possible_duplicate: boolean
+          recipient_kind: string
+          recipient_name: string | null
           rejected_at: string | null
           rejection_reason: string | null
           reminders_paused: boolean
           request_number: string
           status: Database["public"]["Enums"]["payment_status"]
           submitted_at: string | null
+          template_id: string | null
           updated_at: string
-          vendor_id: string
+          vendor_id: string | null
           vendor_snapshot: Json
         }
         Insert: {
+          accounting_month?: string | null
           amount: number
           approved_at?: string | null
           approved_by?: string | null
@@ -513,9 +599,12 @@ export type Database = {
           description: string
           due_date?: string | null
           duplicate_of?: string | null
+          employee_id?: string | null
+          expense_type?: Database["public"]["Enums"]["expense_type"]
           id?: string
           invoice_number?: string | null
           invoice_status?: Database["public"]["Enums"]["invoice_status"]
+          is_sensitive?: boolean
           monday_item_id?: string | null
           monday_sync_status?: string
           monday_synced_at?: string | null
@@ -525,17 +614,21 @@ export type Database = {
           payment_snapshot?: Json
           po_reference?: string | null
           possible_duplicate?: boolean
+          recipient_kind?: string
+          recipient_name?: string | null
           rejected_at?: string | null
           rejection_reason?: string | null
           reminders_paused?: boolean
           request_number?: string
           status?: Database["public"]["Enums"]["payment_status"]
           submitted_at?: string | null
+          template_id?: string | null
           updated_at?: string
-          vendor_id: string
+          vendor_id?: string | null
           vendor_snapshot?: Json
         }
         Update: {
+          accounting_month?: string | null
           amount?: number
           approved_at?: string | null
           approved_by?: string | null
@@ -545,9 +638,12 @@ export type Database = {
           description?: string
           due_date?: string | null
           duplicate_of?: string | null
+          employee_id?: string | null
+          expense_type?: Database["public"]["Enums"]["expense_type"]
           id?: string
           invoice_number?: string | null
           invoice_status?: Database["public"]["Enums"]["invoice_status"]
+          is_sensitive?: boolean
           monday_item_id?: string | null
           monday_sync_status?: string
           monday_synced_at?: string | null
@@ -557,17 +653,34 @@ export type Database = {
           payment_snapshot?: Json
           po_reference?: string | null
           possible_duplicate?: boolean
+          recipient_kind?: string
+          recipient_name?: string | null
           rejected_at?: string | null
           rejection_reason?: string | null
           reminders_paused?: boolean
           request_number?: string
           status?: Database["public"]["Enums"]["payment_status"]
           submitted_at?: string | null
+          template_id?: string | null
           updated_at?: string
-          vendor_id?: string
+          vendor_id?: string | null
           vendor_snapshot?: Json
         }
         Relationships: [
+          {
+            foreignKeyName: "payment_requests_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_requests_template_fk"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "recurring_templates"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "payment_requests_vendor_id_fkey"
             columns: ["vendor_id"]
@@ -727,6 +840,78 @@ export type Database = {
           id?: string
         }
         Relationships: []
+      }
+      recurring_templates: {
+        Row: {
+          active: boolean
+          amount: number
+          category: string | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          description: string
+          due_day: number
+          employee_id: string | null
+          expense_type: Database["public"]["Enums"]["expense_type"]
+          id: string
+          name: string
+          payment_method: Database["public"]["Enums"]["payment_method"]
+          recipient_name: string | null
+          updated_at: string
+          vendor_id: string | null
+        }
+        Insert: {
+          active?: boolean
+          amount: number
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency: string
+          description: string
+          due_day?: number
+          employee_id?: string | null
+          expense_type?: Database["public"]["Enums"]["expense_type"]
+          id?: string
+          name: string
+          payment_method?: Database["public"]["Enums"]["payment_method"]
+          recipient_name?: string | null
+          updated_at?: string
+          vendor_id?: string | null
+        }
+        Update: {
+          active?: boolean
+          amount?: number
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          description?: string
+          due_day?: number
+          employee_id?: string | null
+          expense_type?: Database["public"]["Enums"]["expense_type"]
+          id?: string
+          name?: string
+          payment_method?: Database["public"]["Enums"]["payment_method"]
+          recipient_name?: string | null
+          updated_at?: string
+          vendor_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recurring_templates_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recurring_templates_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -961,13 +1146,13 @@ export type Database = {
       vendors: {
         Row: {
           address_line: string | null
-          beneficiary_name: string
+          beneficiary_name: string | null
           city: string | null
           contact_first_name: string | null
           contact_last_name: string | null
           country: string | null
           created_at: string
-          email: string
+          email: string | null
           id: string
           internal_notes: string | null
           is_favorite: boolean
@@ -975,6 +1160,7 @@ export type Database = {
           monday_synced_at: string | null
           payment_details_changed: boolean
           payment_details_changed_at: string | null
+          payout_ready: boolean
           phone: string | null
           postal_code: string | null
           preferred_currency: string | null
@@ -989,13 +1175,13 @@ export type Database = {
         }
         Insert: {
           address_line?: string | null
-          beneficiary_name: string
+          beneficiary_name?: string | null
           city?: string | null
           contact_first_name?: string | null
           contact_last_name?: string | null
           country?: string | null
           created_at?: string
-          email: string
+          email?: string | null
           id?: string
           internal_notes?: string | null
           is_favorite?: boolean
@@ -1003,6 +1189,7 @@ export type Database = {
           monday_synced_at?: string | null
           payment_details_changed?: boolean
           payment_details_changed_at?: string | null
+          payout_ready?: boolean
           phone?: string | null
           postal_code?: string | null
           preferred_currency?: string | null
@@ -1017,13 +1204,13 @@ export type Database = {
         }
         Update: {
           address_line?: string | null
-          beneficiary_name?: string
+          beneficiary_name?: string | null
           city?: string | null
           contact_first_name?: string | null
           contact_last_name?: string | null
           country?: string | null
           created_at?: string
-          email?: string
+          email?: string | null
           id?: string
           internal_notes?: string | null
           is_favorite?: boolean
@@ -1031,6 +1218,7 @@ export type Database = {
           monday_synced_at?: string | null
           payment_details_changed?: boolean
           payment_details_changed_at?: string | null
+          payout_ready?: boolean
           phone?: string | null
           postal_code?: string | null
           preferred_currency?: string | null
@@ -1050,6 +1238,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_view_payroll: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1081,6 +1270,13 @@ export type Database = {
         | "payment_manager"
         | "accounting"
         | "viewer"
+      expense_type:
+        | "supplier"
+        | "salary"
+        | "pension"
+        | "tax_deduction"
+        | "subscription"
+        | "other"
       invoice_status: "attached" | "pending" | "received"
       payment_method: "paypal" | "bank_transfer"
       payment_status:
@@ -1228,6 +1424,14 @@ export const Constants = {
         "payment_manager",
         "accounting",
         "viewer",
+      ],
+      expense_type: [
+        "supplier",
+        "salary",
+        "pension",
+        "tax_deduction",
+        "subscription",
+        "other",
       ],
       invoice_status: ["attached", "pending", "received"],
       payment_method: ["paypal", "bank_transfer"],
